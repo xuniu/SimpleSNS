@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/iv_avatar"
+        android:src="@drawable/ic_avatar"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"/>
+    <TextView
+        android:id="@+id/tv_nickname"
+        android:layout_marginTop="8dp"
+        android:paddingLeft="72dp"
+        android:text="somebody"
+        android:textSize="16sp"
+        android:alpha=".87"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/tv_content"
+        android:layout_below="@id/tv_nickname"
+        android:paddingLeft="72dp"
+        android:text="I will tell you sth."
+        android:alpha=".54"
+        android:textSize="14sp"
+        android:paddingRight="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <ImageView
+        android:id="@+id/iv_photo"
+        android:layout_below="@id/tv_content"
+        android:paddingLeft="72dp"
+        android:paddingRight="16dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"/>
+
+    <TextView
+        android:id="@+id/tv_post_time"
+        android:layout_below="@id/iv_photo"
+        android:paddingLeft="72dp"
+        android:text="1 hour ago"
+        android:alpha=".54"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <ImageButton
+        android:id="@+id/ib_like"
+        android:layout_below="@id/iv_photo"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="48dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_like"
+        android:layout_width="16dp"
+        android:layout_height="16dp"/>
+
+    <ImageButton
+        android:id="@+id/ib_comment"
+        android:layout_below="@id/iv_photo"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="16dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_comment"
+        android:layout_width="16dp"
+        android:layout_height="16dp"/>
+
+
+</RelativeLayout>

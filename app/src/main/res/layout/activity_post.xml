@@ -1,0 +1,55 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    tools:context="me.xuneal.demo.leanclouddemo.app.ui.PostActivity">
+
+    <include layout="@layout/toolbar_actionbar" />
+
+    <EditText
+        android:id="@+id/text"
+        android:hint="Share some thing"
+        android:layout_below="@+id/toolbar_actionbar"
+        android:gravity="start"
+        android:background="@android:color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minLines="3"
+
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
+        />
+
+    <GridView
+        android:id="@+id/images"
+        android:layout_below="@id/text"
+        android:layout_width="match_parent"
+        android:layout_marginTop="8dp"
+        android:columnWidth="100dp"
+        android:numColumns="auto_fit"
+        android:verticalSpacing="10dp"
+        android:horizontalSpacing="10dp"
+        android:stretchMode="columnWidth"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        />
+
+    <Button
+        android:id="@+id/post"
+        android:layout_below="@id/images"
+        android:text="Post"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+        />
+
+
+
+</RelativeLayout>

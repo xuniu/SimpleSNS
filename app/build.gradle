@@ -3,10 +3,27 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.12.2'
+        classpath 'com.android.tools.build:gradle:0.14.+'
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4+'
     }
 }
 apply plugin: 'com.android.application'
+apply plugin: 'android-apt'
+def AAVersion = '3.2'
+
+apt {
+    arguments {
+        androidManifestFile variant.processResources.manifestFile
+        resourcePackageName 'me.xuneal.demo.simplesns.app'
+
+        // If you're using Android NBS flavors you should use the following line instead of hard-coded packageName
+        // resourcePackageName android.defaultConfig.packageName
+
+        // You can set optional annotation processing options here, like these commented options:
+        // logLevel 'INFO'
+        // logFile '/var/log/aa.log'
+    }
+}
 
 repositories {
         jcenter()
@@ -34,8 +51,21 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
 }
-
 dependencies {
+    apt "org.androidannotations:androidannotations:$AAVersion"
+    compile "org.androidannotations:androidannotations-api:$AAVersion"
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.google.android.gms:play-services:6.1.71'
+    compile 'com.android.support:appcompat-v7:21.0.2'
+    compile 'com.android.support:cardview-v7:21.0.2'
+    compile 'com.android.support:recyclerview-v7:21.0.2'
+    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.3'
+    compile 'joda-time:joda-time:2.5'
+    compile project('libs:ResideMenu')
+
 }
