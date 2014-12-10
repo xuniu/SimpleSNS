@@ -1,33 +1,28 @@
 package me.xuneal.simplesns.app.ui;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.GridLayoutManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.*;
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
+import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import me.xuneal.simplesns.app.R;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
-public class PostActivity extends BaseActivity implements View.OnClickListener {
+public class PostActivity extends BaseActivity implements View.OnClickListener,ObservableScrollViewCallbacks {
 
     private EditText text;
     private GridView images;
     private Button post;
 
     private ArrayList<String> mImageUrls = new ArrayList<>();
-    MyAdapter mAdapter;
+    ImageAdapter mAdapter;
 
     /**
      * Find the Views in the layout<br />
@@ -38,9 +33,7 @@ public class PostActivity extends BaseActivity implements View.OnClickListener {
     private void findViews() {
         text = (EditText)findViewById( R.id.text );
         images = (GridView)findViewById( R.id.images );
-
         post = (Button)findViewById( R.id.post );
-
         post.setOnClickListener( this );
     }
 
@@ -69,7 +62,7 @@ public class PostActivity extends BaseActivity implements View.OnClickListener {
 
         findViews();
         mImageUrls.add("assets://ic_add.png");
-        mAdapter = new MyAdapter(mImageUrls);
+        mAdapter = new ImageAdapter(mImageUrls);
         images.setAdapter(mAdapter);
         images.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -142,53 +135,19 @@ public class PostActivity extends BaseActivity implements View.OnClickListener {
 
     }
 
-    class MyAdapter extends BaseAdapter {
-        private List<String> mImageUrls;
 
-        public MyAdapter(List<String> imageUrls) {
-            mImageUrls = imageUrls;
-        }
+    @Override
+    public void onScrollChanged(int i, boolean b, boolean b2) {
 
-        @Override
-        public int getCount() {
-            return mImageUrls.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return mImageUrls.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder viewHolder;
-            if (convertView!=null && convertView.getTag()!=null){
-                viewHolder = (ViewHolder) convertView.getTag();
-
-            } else {
-                convertView = new ImageView(parent.getContext());
-                viewHolder = new ViewHolder();
-                viewHolder.mImageView = (ImageView) convertView;
-                viewHolder.mImageView.setLayoutParams(new AbsListView.LayoutParams(100, 100));
-            }
-            String filename = "";
-            if (position != mImageUrls.size()-1){
-                filename = "file://" + mImageUrls.get(position);
-            } else {
-                filename = mImageUrls.get(position);
-            }
-            ImageLoader.getInstance().displayImage(filename, viewHolder.mImageView);
-
-            return convertView;
-        }
     }
 
-    static class ViewHolder {
-        ImageView mImageView;
+    @Override
+    public void onDownMotionEvent() {
+
+    }
+
+    @Override
+    public void onUpOrCancelMotionEvent(ScrollState scrollState) {
+
     }
 }

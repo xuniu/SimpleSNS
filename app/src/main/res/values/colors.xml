@@ -5,4 +5,12 @@
     <color name="color_primary">#3f51b5</color>
     <color name="color_primary_darker">#303f9f</color>
     <color name="color_accent">#f50057</color>
+
+    <color name="fab_color_pressed">#007787</color>
+    <color name="fab_color_shadow">#44000000</color>
+
+    <color name="btn_default_light_normal">#00000000</color>
+    <color name="btn_default_light_pressed">#40ffffff</color>
+
+    <color name="bg_comments">#ffffff</color>
 </resources>

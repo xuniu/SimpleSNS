@@ -52,7 +52,7 @@ public class Tweet extends AVObject{
                 e.printStackTrace();
             }
         }
-        put(IMAGES, fileList);
+        addAll(IMAGES, fileList);
     }
 
     public String getPostTime() {

@@ -7,5 +7,7 @@
     <string name="register">register</string>
     <string name="title_activity_post">PostActivity</string>
     <string name="action_post">Post</string>
+    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="action_profile">profile</string>
 
 </resources>

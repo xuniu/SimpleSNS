@@ -7,7 +7,6 @@ repositories {
 android {
     compileSdkVersion 21
     buildToolsVersion "21.1.1"
-    useOldManifestMerger true
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 21
