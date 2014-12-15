@@ -14,13 +14,13 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
-        android:name=".MyApplication"
+        android:name="me.xuneal.simplesns.app.MyApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".ui.MainActivity"
+            android:name="me.xuneal.simplesns.app.ui.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,14 +29,19 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.LoginActivity"
+            android:name="me.xuneal.simplesns.app.ui.LoginActivity"
             android:label="Login" />
         <activity
-            android:name=".ui.PostActivity"
+            android:name="me.xuneal.simplesns.app.ui.PostActivity"
+            android:parentActivityName=".ui.MainActivity"
             android:label="Post" />
         <activity
-            android:name=".ui.ProfileActivity"
+            android:name="me.xuneal.simplesns.app.ui.ProfileActivity"
             android:label="@string/title_activity_profile" >
+        </activity>
+        <activity
+            android:name="me.xuneal.simplesns.app.ui.CommentsActivity"
+            android:label="@string/title_activity_comments" >
         </activity>
     </application>
 

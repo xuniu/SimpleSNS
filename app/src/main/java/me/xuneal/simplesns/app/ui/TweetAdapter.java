@@ -1,0 +1,172 @@
+package me.xuneal.simplesns.app.ui;
+
+import android.content.Context;
+import android.support.v7.widget.RecyclerView;
+import android.text.format.DateUtils;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.TextView;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import de.hdodenhof.circleimageview.CircleImageView;
+import me.xuneal.simplesns.app.R;
+import me.xuneal.simplesns.app.model.Tweet;
+import me.xuneal.simplesns.app.util.Utils;
+import org.joda.time.LocalDateTime;
+
+import java.util.List;
+
+/**
+ * Created by xyz on 2014/12/11.
+ */
+public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> implements View.OnClickListener {
+
+    private static final int ANIMATED_ITEMS_COUNT = 5;
+
+    private OnFeedItemClickListener mOnFeedItemClickListener;
+
+    public void setOnFeedItemClickListener(OnFeedItemClickListener onFeedItemClickListener) {
+        mOnFeedItemClickListener = onFeedItemClickListener;
+    }
+
+    private Context context;
+    private int lastAnimatedPosition = -1;
+    private int itemsCount = 0;
+
+    private List<Tweet> tweets;
+
+    public List<Tweet> getTweets() {
+        return tweets;
+    }
+
+    public TweetAdapter(Context context, List<Tweet> tweets) {
+        this.tweets = tweets;
+
+        this.context = context;
+    }
+
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+        View view = LayoutInflater.from(viewGroup.getContext())
+                .inflate(R.layout.item_tweet, viewGroup, false);
+
+        ViewHolder viewHolder = new ViewHolder(view);
+        return viewHolder;
+    }
+
+
+    private void runEnterAnimation(View view, int position) {
+        if (position >= ANIMATED_ITEMS_COUNT - 1) {
+            return;
+        }
+
+        if (position > lastAnimatedPosition) {
+            lastAnimatedPosition = position;
+            view.setTranslationY(Utils.getScreenHeight(context)/3);
+            view.animate()
+                    .translationY(0)
+                    .setInterpolator(new DecelerateInterpolator(3.f))
+                    .setDuration(700)
+                    .start();
+        }
+    }
+
+    @Override
+    public void onBindViewHolder(ViewHolder viewHolder, int i) {
+        runEnterAnimation(viewHolder.itemView, i);
+        long now = LocalDateTime.now().toDateTime().getMillis();
+        Tweet tweet = tweets.get(i);
+        ImageLoader.getInstance().displayImage(tweet.getPoster().getAvatar(), viewHolder.ivAvatar);
+        viewHolder.tvNickname.setText(tweet.getPoster().getNickName());
+        viewHolder.tvContent.setText(tweet.getContent());
+        viewHolder.tvPostTime.setText(DateUtils.getRelativeTimeSpanString(
+                LocalDateTime.parse(tweet.getPostTime()).toDateTime().getMillis(),
+                now, 0, DateUtils.FORMAT_ABBREV_RELATIVE));
+        viewHolder.ivPhoto.setAdapter(new ImageAdapter(tweet.getImageUrl()));
+        viewHolder.ibComment.setOnClickListener(this);
+        viewHolder.ibComment.setTag(i);
+
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return itemsCount;
+    }
+
+    public void updateItems() {
+        itemsCount = tweets.size();
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.ib_comment) {
+            if (mOnFeedItemClickListener != null) {
+                mOnFeedItemClickListener.onCommentsClick(v, (Integer) v.getTag());
+            }
+        }
+    }
+
+
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            findViews();
+        }
+
+        private CircleImageView ivAvatar;
+        private TextView tvNickname;
+        private TextView tvContent;
+        private GridView ivPhoto;
+        private TextView tvPostTime;
+        private ImageView ibLike;
+        private ImageView ibComment;
+
+        /**
+         * Find the Views in the layout<br />
+         * <br />
+         * Auto-created on 2014-11-20 14:48:19 by Android Layout Finder
+         * (http://www.buzzingandroid.com/tools/android-layout-finder)
+         */
+        private void findViews() {
+            ivAvatar = (CircleImageView) itemView.findViewById(R.id.iv_avatar);
+            tvNickname = (TextView) itemView.findViewById(R.id.tv_nickname);
+            tvContent = (TextView) itemView.findViewById(R.id.tv_content);
+            ivPhoto = (GridView) itemView.findViewById(R.id.iv_photo);
+            tvPostTime = (TextView) itemView.findViewById(R.id.tv_post_time);
+            ibLike = (ImageView) itemView.findViewById(R.id.ib_like);
+            ibComment = (ImageView) itemView.findViewById(R.id.ib_comment);
+
+            ibLike.setOnClickListener(this);
+            ibComment.setOnClickListener(this);
+        }
+
+        /**
+         * Handle button click events<br />
+         * <br />
+         * Auto-created on 2014-11-20 14:48:19 by Android Layout Finder
+         * (http://www.buzzingandroid.com/tools/android-layout-finder)
+         */
+        @Override
+        public void onClick(View v) {
+            if (v == ibLike) {
+                // Handle clicks for ibLike
+            } else if (v == ibComment) {
+                // Handle clicks for ibComment
+            }
+        }
+
+
+    }
+
+    public interface OnFeedItemClickListener {
+        public void onCommentsClick(View v, int position);
+    }
+}
+

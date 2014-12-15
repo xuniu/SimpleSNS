@@ -11,33 +11,43 @@ import org.joda.time.LocalDateTime;
 @AVClassName("Comments")
 public class Comment extends AVObject{
 
-    private AVUser poster;
-    private String content;
-    private String postTime;
+    private static final String POSTER = "poster";
+    private static final String CONTENT= "content";
+    private static final String POST_TIME = "post_time";
+    private static final String TWEET = "tweet";
 
     public Comment(){}
 
-    public AVUser getPoster() {
-        return poster;
+    public Account getPoster() {
+        return getAVUser(POSTER, Account.class);
     }
 
-    public void setPoster(AVUser poster) {
-        this.poster = poster;
+    public void setPoster(Account poster) {
+        put(POSTER, poster);
     }
 
     public String getContent() {
-        return content;
+        return getString(CONTENT);
     }
 
     public void setContent(String content) {
-        this.content = content;
+        put(CONTENT, content);
     }
 
     public String getPostTime() {
-        return postTime;
+        return getString(POST_TIME);
     }
 
     public void setPostTime(String postTime) {
-        this.postTime = postTime;
+        put(POST_TIME, postTime);
     }
+
+    public Tweet getTweet(){
+        return getAVObject(TWEET);
+    }
+
+    public void setTweet(Tweet tweet){
+        put(TWEET, tweet);
+    }
+
 }

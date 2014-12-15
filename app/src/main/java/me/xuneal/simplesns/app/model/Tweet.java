@@ -20,6 +20,7 @@ public class Tweet extends AVObject{
     public static final String LIKES = "likes";
     public static final String COMMENTS = "comments";
     public static final String IMAGES = "images";
+    public static final String TABLE_NAME = "Tweets";
 
     public Tweet(){}
 
@@ -86,13 +87,22 @@ public class Tweet extends AVObject{
 
 
     public List<AVObject> getComments() throws AVException {
-        return getRelation(COMMENTS).getQuery().find();
+        AVQuery<AVObject> query = AVQuery.getQuery("Comments");
+        query.whereEqualTo("tweet", this);
+        return  query.find();
     }
 
     public void getComments(FindCallback<AVObject> callback){
-        getRelation(COMMENTS).getQuery().findInBackground(callback);
+
+        AVQuery<AVObject> query = AVQuery.getQuery("Comments");
+        query.whereEqualTo("tweet", this);
+        query.findInBackground(callback);
+
+
     }
-    public void addComment(Comment comment) {
-        getRelation(COMMENTS).add(comment);
-    }
+//    public void addComment(Comment comment) {
+//        AVRelation relation = getRelation(COMMENTS);
+//        relation.setTargetClass("Comments");
+//        relation.add(comment);
+//    }
 }

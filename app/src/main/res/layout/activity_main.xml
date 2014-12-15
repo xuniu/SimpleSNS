@@ -6,15 +6,21 @@
                 tools:context=".MainActivity">
 
     <include layout="@layout/toolbar_actionbar"/>
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/sr_root"
+        android:layout_below="@+id/toolbar_actionbar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
 
     <!-- A RecyclerView with some commonly used attributes -->
     <com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView
             android:id="@+id/my_recycler_view"
-            android:layout_below="@+id/toolbar_actionbar"
+
             android:scrollbars="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <com.melnykov.fab.FloatingActionButton
         android:id="@+id/fab"
