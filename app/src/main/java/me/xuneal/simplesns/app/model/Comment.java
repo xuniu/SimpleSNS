@@ -10,6 +10,7 @@ import org.joda.time.LocalDateTime;
  */
 @AVClassName("Comments")
 public class Comment extends AVObject{
+    public static final String TABLE_NAME="Comments";
 
     private static final String POSTER = "poster";
     private static final String CONTENT= "content";

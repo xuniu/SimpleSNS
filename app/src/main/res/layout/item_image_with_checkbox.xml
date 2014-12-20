@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<me.xuneal.simplesns.app.ui.components.CheckableRelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cl_panel"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+
+    <me.xuneal.simplesns.app.ui.components.SquareImageView
+        android:id="@+id/siv_image"
+        android:scaleType="centerCrop"
+        android:clickable="false"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+    <CheckBox
+        android:id="@+id/cb_select"
+        android:clickable="false"
+        android:focusable="false"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+
+</me.xuneal.simplesns.app.ui.components.CheckableRelativeLayout>

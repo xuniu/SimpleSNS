@@ -35,6 +35,7 @@ public class Tweet extends AVObject{
     public List<String> getImageUrl() {
         List<AVFile> files = getList(IMAGES);
         List<String> result = new LinkedList<>();
+        if (files == null) return result;
         for (AVFile file : files){
             result.add(file.getUrl());
         }

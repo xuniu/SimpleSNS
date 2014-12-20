@@ -1,4 +1,4 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
@@ -9,37 +9,59 @@
         android:id="@+id/root_panel"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:visibility="gone"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar_actionbar"
+        android:background="@color/bg_comments"
         >
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/comments"
-            android:layout_below="@+id/toolbar_actionbar"
-            android:layout_above="@+id/send_panel"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            />
+            android:layout_weight="1">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_comments"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbars="none" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:layout_gravity="bottom"
+                android:background="@drawable/shadow_top" />
+        </FrameLayout>
         <LinearLayout
             android:id="@+id/send_panel"
             android:layout_width="match_parent"
-            android:layout_height="48dp">
+            android:layout_height="wrap_content"
+            android:background="@color/bg_comments"
+            android:gravity="center_vertical"
+            android:paddingBottom="4dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="8dp">
             <EditText
                 android:id="@+id/comment"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                />
-            <Button
-                android:id="@+id/send"
-                android:text="Send"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"/>
+                android:textColor="#555555"
+                android:textSize="14sp" />
+            <me.xuneal.simplesns.app.ui.components.SendCommentButton
+                android:id="@+id/scb_send"
+                android:layout_width="72dp"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="2dp"
+                android:layout_marginLeft="8dp"
+                android:background="@drawable/btn_send_comment"
+                android:elevation="4dp"
+                android:orientation="vertical"
+                >
+
+            </me.xuneal.simplesns.app.ui.components.SendCommentButton>
+
         </LinearLayout>
     </LinearLayout>
 
 
-</LinearLayout>
+</RelativeLayout>

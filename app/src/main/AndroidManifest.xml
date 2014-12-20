@@ -33,15 +33,32 @@
             android:label="Login" />
         <activity
             android:name="me.xuneal.simplesns.app.ui.PostActivity"
-            android:parentActivityName=".ui.MainActivity"
-            android:label="Post" />
+            android:label="Post"
+            android:parentActivityName="me.xuneal.simplesns.app.ui.MainActivity" />
         <activity
             android:name="me.xuneal.simplesns.app.ui.ProfileActivity"
             android:label="@string/title_activity_profile" >
         </activity>
         <activity
             android:name="me.xuneal.simplesns.app.ui.CommentsActivity"
-            android:label="@string/title_activity_comments" >
+            android:label="@string/title_activity_comments"
+            android:parentActivityName="me.xuneal.simplesns.app.ui.MainActivity" >
+        </activity>
+        <activity
+            android:name="me.xuneal.simplesns.app.ui.PickPhotos"
+            android:label="@string/title_activity_pick_photos"
+            android:parentActivityName="me.xuneal.simplesns.app.ui.PostActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="me.xuneal.simplesns.app.ui.PostActivity" />
+        </activity>
+        <activity
+            android:name="me.xuneal.simplesns.app.ui.RegisterActivity"
+            android:label="@string/title_activity_register"
+            android:parentActivityName="me.xuneal.simplesns.app.ui.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="me.xuneal.simplesns.app.ui.MainActivity" />
         </activity>
     </application>
 

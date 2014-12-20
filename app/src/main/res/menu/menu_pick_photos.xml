@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="me.xuneal.simplesns.app.ui.PickPhotos">
+    <item android:id="@+id/action_sure"
+          android:title="SURE"
+          android:orderInCategory="100"
+          app:showAsAction="always"/>
+</menu>

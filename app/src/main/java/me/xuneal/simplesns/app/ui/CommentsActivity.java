@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,13 +20,14 @@ import me.xuneal.simplesns.app.R;
 import me.xuneal.simplesns.app.model.Account;
 import me.xuneal.simplesns.app.model.Comment;
 import me.xuneal.simplesns.app.model.Tweet;
+import me.xuneal.simplesns.app.ui.components.SendCommentButton;
 import me.xuneal.simplesns.app.util.Utils;
 import org.joda.time.LocalDateTime;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommentsActivity extends BaseActivity implements View.OnClickListener {
+public class CommentsActivity extends BaseActivity implements View.OnClickListener, SendCommentButton.OnSendClickListener  {
     public static final String ARG_DRAWING_START_LOCATION = "arg_drawing_start_location";
     public static final String ARG_POST_ID = "arg_post_id";
 
@@ -33,7 +35,7 @@ public class CommentsActivity extends BaseActivity implements View.OnClickListen
 
     private RecyclerView mRvComments;
     private EditText mComment;
-    private Button mSend;
+    private SendCommentButton mSend;
     private CommentAdapter mCommentAdapter;
 
     private int drawingStartLocation;
@@ -50,11 +52,11 @@ public class CommentsActivity extends BaseActivity implements View.OnClickListen
      */
     private void findViews() {
         mRootPanel = (LinearLayout) findViewById(R.id.root_panel);
-        mRvComments = (RecyclerView) findViewById(R.id.comments);
+        mRvComments = (RecyclerView) findViewById(R.id.rv_comments);
         mComment = (EditText) findViewById(R.id.comment);
         mSendPanel = (LinearLayout) findViewById(R.id.send_panel);
-        mSend = (Button) findViewById(R.id.send);
-        mSend.setOnClickListener(this);
+        mSend = (SendCommentButton) findViewById(R.id.scb_send);
+        mSend.setOnSendClickListener(this);
     }
 
     /**
@@ -167,6 +169,34 @@ public class CommentsActivity extends BaseActivity implements View.OnClickListen
                     }
                 })
                 .start();
+    }
+
+    @Override
+    public void onSendClickListener(View v) {
+        if (validateComment()) {
+            Comment comment = new Comment();
+            comment.setPoster(AVUser.getCurrentUser(Account.class));
+            comment.setPostTime(LocalDateTime.now().toString("yyyy-MM-dd HH:mm"));
+            comment.setContent(mComment.getText().toString());
+            comment.setTweet(mTweet);
+            comment.saveInBackground();
+            mCommentAdapter.addItem(comment);
+            mCommentAdapter.setAnimationsLocked(false);
+            mCommentAdapter.setDelayEnterAnimation(false);
+            mRvComments.smoothScrollBy(0, mRvComments.getChildAt(0).getHeight() * mCommentAdapter.getItemCount());
+
+            mComment.setText(null);
+            mSend.setCurrentState(SendCommentButton.STATE_DONE);
+        }
+    }
+
+    private boolean validateComment() {
+        if (TextUtils.isEmpty(mComment.getText())) {
+            mSend.startAnimation(AnimationUtils.loadAnimation(this, R.anim.shake_error));
+            return false;
+        }
+
+        return true;
     }
 
     //    @Override

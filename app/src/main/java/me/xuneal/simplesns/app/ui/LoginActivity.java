@@ -70,7 +70,7 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLoginOrRegister(true);
+                    attemptLoginOrRegister();
                     return true;
                 }
                 return false;
@@ -81,15 +81,14 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
         mUserSignIn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptLoginOrRegister(true);
+                attemptLoginOrRegister();
             }
         });
 
-        Button userSignUp = (Button) findViewById(R.id.sign_up);
-        userSignUp.setOnClickListener(new OnClickListener() {
+        findViewById(R.id.tv_register).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                attemptLoginOrRegister(false);
+                attemptLoginOrRegister();
             }
         });
 
@@ -110,7 +109,7 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    public void attemptLoginOrRegister(boolean isLogin) {
+    public void attemptLoginOrRegister() {
 //        if (mAuthTask != null) {
 //            return;
 //        }
@@ -161,7 +160,7 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
             user.setUsername(username);
             user.setPassword(password);
 
-            if (isLogin) {
+//            if (isLogin) {
                 AVUser.logInInBackground(username, password, new LogInCallback() {
                     public void done(AVUser user, AVException e) {
                         if (user != null) {
@@ -175,24 +174,24 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
                         }
                     }
                 });
-            } else {
-
-                user.signUpInBackground(new SignUpCallback() {
-                    @Override
-                    public void done(AVException e) {
-                        if (e == null) {
-                            Toast.makeText(getApplicationContext(), "Register OK!", Toast.LENGTH_SHORT).show();
-                        } else {
-
-                            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                            if (e.getCode() == AVException.EMAIL_TAKEN) {
-
-                            }
-                        }
-                    }
-                });
-
-            }
+//            } else {
+//
+//                user.signUpInBackground(new SignUpCallback() {
+//                    @Override
+//                    public void done(AVException e) {
+//                        if (e == null) {
+//                            Toast.makeText(getApplicationContext(), "Register OK!", Toast.LENGTH_SHORT).show();
+//                        } else {
+//
+//                            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+//                            if (e.getCode() == AVException.EMAIL_TAKEN) {
+//
+//                            }
+//                        }
+//                    }
+//                });
+//
+//            }
             showProgress(false);
 
 
@@ -249,7 +248,7 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         return new CursorLoader(this,
-                // Retrieve data rows for the device user's 'profile' contact.
+                // Retrieve data rows for the device user's 'menu_profile' contact.
                 Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI,
                         ContactsContract.Contacts.Data.CONTENT_DIRECTORY), ProfileQuery.PROJECTION,
 

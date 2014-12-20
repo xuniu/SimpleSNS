@@ -15,11 +15,10 @@ import me.xuneal.simplesns.app.R;
 
 import java.util.ArrayList;
 
-public class PostActivity extends BaseActivity implements View.OnClickListener,ObservableScrollViewCallbacks {
+public class PostActivity extends BaseActivity  {
 
     private EditText text;
     private GridView images;
-    private Button post;
 
     private ArrayList<String> mImageUrls = new ArrayList<>();
     ImageAdapter mAdapter;
@@ -33,8 +32,6 @@ public class PostActivity extends BaseActivity implements View.OnClickListener,O
     private void findViews() {
         text = (EditText)findViewById( R.id.text );
         images = (GridView)findViewById( R.id.images );
-        post = (Button)findViewById( R.id.post );
-        post.setOnClickListener( this );
     }
 
     /**
@@ -43,13 +40,7 @@ public class PostActivity extends BaseActivity implements View.OnClickListener,O
      * Auto-created on 2014-11-21 09:47:54 by Android Layout Finder
      * (http://www.buzzingandroid.com/tools/android-layout-finder)
      */
-    @Override
-    public void onClick(View v) {
-        if ( v == post ) {
-            // Handle clicks for post
 
-        }
-    }
 
 
 
@@ -68,25 +59,16 @@ public class PostActivity extends BaseActivity implements View.OnClickListener,O
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position== parent.getCount()-1){
-                    Intent intent = new Intent();
-                    intent.setType("image/*");
-                    intent.setAction(Intent.ACTION_GET_CONTENT);
-                    startActivityForResult(Intent.createChooser(intent, "Select Picture"), 0);
+                    Intent intent = new Intent(PostActivity.this, PickPhotos.class);
+//                    intent.setType("image/*");
+//                    intent.setAction(Intent.ACTION_GET_CONTENT);
+//                    startActivityForResult(Intent.createChooser(intent, "Select Picture"), 0);
+                    startActivityForResult(intent, 0);
                 }
             }
         });
 
-        post.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent data = new Intent();
-                data.putExtra("content", text.getText().toString());
-                mImageUrls.remove(mImageUrls.size() - 1);
-                data.putStringArrayListExtra("images", mImageUrls);
-                setResult(RESULT_OK, data);
-                finish();
-            }
-        });
+
 
     }
 
@@ -106,8 +88,13 @@ public class PostActivity extends BaseActivity implements View.OnClickListener,O
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_post) {
+            Intent data = new Intent();
+            data.putExtra("content", text.getText().toString());
+            mImageUrls.remove(mImageUrls.size() - 1);
+            data.putStringArrayListExtra("images", mImageUrls);
+            setResult(RESULT_OK, data);
+            finish();
         }
 
         return super.onOptionsItemSelected(item);
@@ -117,18 +104,22 @@ public class PostActivity extends BaseActivity implements View.OnClickListener,O
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && requestCode == 0&& data != null && data.getData() != null){
 
-            Uri _uri = data.getData();
+//            Uri _uri = data.getData();
+//
+//            //User had pick an image.
+//            Cursor cursor = getContentResolver().query(_uri, new String[] { android.provider.MediaStore.Images.ImageColumns.DATA }, null, null, null);
+//            cursor.moveToFirst();
+//
+//            //Link to the image
+//            final String imageFilePath = cursor.getString(0);
+//            cursor.close();
 
-            //User had pick an image.
-            Cursor cursor = getContentResolver().query(_uri, new String[] { android.provider.MediaStore.Images.ImageColumns.DATA }, null, null, null);
-            cursor.moveToFirst();
+            String[] urls = data.getStringArrayExtra("urls");
+            for (String url : urls){
+                mImageUrls.add(mImageUrls.size()-1, url);
 
-            //Link to the image
-            final String imageFilePath = cursor.getString(0);
-            cursor.close();
+            }
 
-
-            mImageUrls.add(mImageUrls.size()-1, imageFilePath);
             mAdapter.notifyDataSetChanged();
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -136,18 +127,5 @@ public class PostActivity extends BaseActivity implements View.OnClickListener,O
     }
 
 
-    @Override
-    public void onScrollChanged(int i, boolean b, boolean b2) {
 
-    }
-
-    @Override
-    public void onDownMotionEvent() {
-
-    }
-
-    @Override
-    public void onUpOrCancelMotionEvent(ScrollState scrollState) {
-
-    }
 }

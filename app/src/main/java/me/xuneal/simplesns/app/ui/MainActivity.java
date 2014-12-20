@@ -12,6 +12,8 @@ import android.widget.*;
 import com.avos.avoscloud.*;
 import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
 import com.melnykov.fab.FloatingActionButton;
+import com.special.ResideMenu.ResideMenu;
+import com.special.ResideMenu.ResideMenuItem;
 import me.xuneal.simplesns.app.R;
 import me.xuneal.simplesns.app.model.Account;
 import me.xuneal.simplesns.app.model.Tweet;
@@ -23,7 +25,7 @@ import java.util.List;
 
 
 public class MainActivity extends BaseActivity
-implements TweetAdapter.OnFeedItemClickListener {
+implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
 
     private static final int ANIM_DURATION_TOOLBAR = 300;
     private static final int ANIM_DURATION_FAB = 400;
@@ -37,6 +39,7 @@ implements TweetAdapter.OnFeedItemClickListener {
     private FloatingActionButton fab;
 
     boolean pendingIntroAnimation;
+    private ResideMenu mResideMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +79,36 @@ implements TweetAdapter.OnFeedItemClickListener {
         }
 
         mTweetAdapter.setOnFeedItemClickListener(this);
+
+        // attach to current activity;
+        mResideMenu = new ResideMenu(this);
+        mResideMenu.setBackground(R.drawable.bg_resize_menu);
+        mResideMenu.attachToActivity(this);
+
+        // create menu items;
+        String titles[] = { "Profile", "Setting", "About Me",  };
+        int icon[] = { R.drawable.ic_avatar, R.drawable.ic_setting, R.drawable.ic_about};
+
+        for (int i = 0; i < titles.length; i++){
+            ResideMenuItem item = new ResideMenuItem(this, icon[i], titles[i]);
+            item.setTag(i);
+            item.setOnClickListener(this);
+            mResideMenu.addMenuItem(item,  ResideMenu.DIRECTION_LEFT); // or  ResideMenu.DIRECTION_RIGHT
+        }
+
+        getActionBarToolbar().setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mResideMenu.isOpened()){
+                    mResideMenu.closeMenu();
+                } else {
+                    mResideMenu.openMenu(ResideMenu.DIRECTION_LEFT);
+                }
+
+            }
+        });
+
+
     }
 
     private void loadData(){
@@ -216,5 +249,17 @@ implements TweetAdapter.OnFeedItemClickListener {
         intent.putExtra(CommentsActivity.ARG_POST_ID, mTweetAdapter.getTweets().get(position).getObjectId());
         startActivity(intent);
         overridePendingTransition(0,0);
+    }
+
+    @Override
+    public void onClick(View v) {
+        int id = (int)v.getTag();
+        switch (id ){
+            case 0:
+                startActivity(new Intent(this, ProfileActivity.class));
+                break;
+            default:
+                break;
+        }
     }
 }

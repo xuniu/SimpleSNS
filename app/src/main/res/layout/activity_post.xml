@@ -12,11 +12,10 @@
         android:hint="Share some thing"
         android:layout_below="@+id/toolbar_actionbar"
         android:gravity="start"
-        android:background="@android:color/white"
+        android:background="@android:color/transparent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minLines="3"
-
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="16dp"
@@ -27,28 +26,17 @@
         android:layout_below="@id/text"
         android:layout_width="match_parent"
         android:layout_marginTop="8dp"
-        android:columnWidth="100dp"
-        android:numColumns="auto_fit"
-        android:verticalSpacing="10dp"
-        android:horizontalSpacing="10dp"
-        android:stretchMode="columnWidth"
+        android:numColumns="3"
+        android:verticalSpacing="8dp"
+        android:horizontalSpacing="8dp"
         android:gravity="center"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
+        android:background="@android:color/transparent"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         />
 
-    <Button
-        android:id="@+id/post"
-        android:layout_below="@id/images"
-        android:text="Post"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="8dp"
-        />
+
 
 
 

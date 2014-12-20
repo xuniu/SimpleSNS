@@ -6,6 +6,7 @@ import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import me.xuneal.simplesns.app.ui.components.SquareImageView;
 
 import java.util.List;
 
@@ -41,10 +42,11 @@ class ImageAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
 
         } else {
-            convertView = new ImageView(parent.getContext());
+            convertView = new SquareImageView(parent.getContext());
+            ((SquareImageView)convertView).setScaleType(ImageView.ScaleType.CENTER_CROP);
             viewHolder = new ViewHolder();
-            viewHolder.mImageView = (ImageView) convertView;
-            viewHolder.mImageView.setLayoutParams(new AbsListView.LayoutParams(100, 100));
+            viewHolder.mImageView = (SquareImageView) convertView;
+
         }
         String filename = "";
         if (position != mImageUrls.size()-1){
@@ -58,6 +60,6 @@ class ImageAdapter extends BaseAdapter {
     }
 
     static class ViewHolder {
-        ImageView mImageView;
+        SquareImageView mImageView;
     }
 }

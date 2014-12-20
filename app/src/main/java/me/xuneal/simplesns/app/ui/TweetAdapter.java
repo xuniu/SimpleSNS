@@ -85,7 +85,9 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
         viewHolder.tvPostTime.setText(DateUtils.getRelativeTimeSpanString(
                 LocalDateTime.parse(tweet.getPostTime()).toDateTime().getMillis(),
                 now, 0, DateUtils.FORMAT_ABBREV_RELATIVE));
-        viewHolder.ivPhoto.setAdapter(new ImageAdapter(tweet.getImageUrl()));
+        if (tweet.getImageUrl() != null) {
+            viewHolder.ivPhoto.setAdapter(new ImageAdapter(tweet.getImageUrl()));
+        }
         viewHolder.ibComment.setOnClickListener(this);
         viewHolder.ibComment.setTag(i);
 
