@@ -4,10 +4,13 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:layout_margin="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
         android:background="@android:color/white"
         >
 <RelativeLayout
+
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
     <de.hdodenhof.circleimageview.CircleImageView
@@ -67,13 +70,12 @@
 
 
 
-    <ImageView
-        android:id="@+id/ib_like"
+    <CheckBox
+        android:id="@+id/cb_like"
         android:layout_below="@id/iv_photo"
         android:layout_alignParentRight="true"
         android:layout_marginRight="48dp"
-        android:scaleType="centerInside"
-        android:src="@drawable/ic_like"
+        android:button="@drawable/checkbox_style"
         android:layout_width="18dp"
         android:layout_height="18dp"/>
 

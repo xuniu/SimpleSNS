@@ -14,6 +14,7 @@
         android:layout_below="@+id/toolbar_actionbar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
         android:layout_marginBottom="8dp"
         android:visibility="gone"/>
 
@@ -64,7 +65,7 @@
                     style="?android:textAppearanceSmall"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_margin="16dp"
                     android:text="@string/action_sign_in"
                     android:background="@drawable/btn_send_comment"
                     android:textStyle="bold"/>

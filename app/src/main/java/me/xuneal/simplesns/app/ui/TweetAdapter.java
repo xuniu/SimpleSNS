@@ -7,9 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.*;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVRelation;
+import com.avos.avoscloud.AVUser;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import de.hdodenhof.circleimageview.CircleImageView;
 import me.xuneal.simplesns.app.R;
@@ -22,11 +23,12 @@ import java.util.List;
 /**
  * Created by xyz on 2014/12/11.
  */
-public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> implements View.OnClickListener {
+public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener {
 
     private static final int ANIMATED_ITEMS_COUNT = 5;
 
     private OnFeedItemClickListener mOnFeedItemClickListener;
+    boolean mUserHeader = false;
 
     public void setOnFeedItemClickListener(OnFeedItemClickListener onFeedItemClickListener) {
         mOnFeedItemClickListener = onFeedItemClickListener;
@@ -35,6 +37,7 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
     private Context context;
     private int lastAnimatedPosition = -1;
     private int itemsCount = 0;
+    private View mHeader;
 
     private List<Tweet> tweets;
 
@@ -48,14 +51,45 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
         this.context = context;
     }
 
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.item_tweet, viewGroup, false);
+    public TweetAdapter(Context context, List<Tweet> tweets, boolean useHeader) {
+        this.tweets = tweets;
 
-        ViewHolder viewHolder = new ViewHolder(view);
-        return viewHolder;
+        this.context = context;
+        mUserHeader = useHeader;
     }
+
+    public void setHeader(View view){
+        mHeader = view;
+    }
+
+    public View getHeader() {
+        return mHeader;
+    }
+    @Override
+    public int getItemViewType(int position) {
+        if (position==0 && mUserHeader){
+            return 2;
+        } else
+            return 1;
+    }
+
+
+
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+        View view;
+        if (getItemViewType(i) == 2){
+            view = mHeader;
+            return new VHeader(view);
+        }
+        else {
+            view = LayoutInflater.from(viewGroup.getContext())
+                    .inflate(R.layout.item_tweet, viewGroup, false);
+            ViewHolder viewHolder = new ViewHolder(view);
+            return viewHolder;
+        }
+    }
+
 
 
     private void runEnterAnimation(View view, int position) {
@@ -75,21 +109,64 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, int i) {
-        runEnterAnimation(viewHolder.itemView, i);
-        long now = LocalDateTime.now().toDateTime().getMillis();
-        Tweet tweet = tweets.get(i);
-        ImageLoader.getInstance().displayImage(tweet.getPoster().getAvatar(), viewHolder.ivAvatar);
-        viewHolder.tvNickname.setText(tweet.getPoster().getNickName());
-        viewHolder.tvContent.setText(tweet.getContent());
-        viewHolder.tvPostTime.setText(DateUtils.getRelativeTimeSpanString(
-                LocalDateTime.parse(tweet.getPostTime()).toDateTime().getMillis(),
-                now, 0, DateUtils.FORMAT_ABBREV_RELATIVE));
-        if (tweet.getImageUrl() != null) {
-            viewHolder.ivPhoto.setAdapter(new ImageAdapter(tweet.getImageUrl()));
+    public void onBindViewHolder(RecyclerView.ViewHolder vh, int i) {
+        int pos;
+        if (mUserHeader){
+            pos = i-1;
+            if (i!=0){
+                long now = LocalDateTime.now().toDateTime().getMillis();
+                Tweet tweet = tweets.get(pos);
+                ViewHolder viewHolder = (ViewHolder) vh;
+                runEnterAnimation(viewHolder.itemView, pos);
+
+                ImageLoader.getInstance().displayImage(tweet.getPoster().getAvatar(), viewHolder.ivAvatar);
+                viewHolder.tvNickname.setText(tweet.getPoster().getNickName());
+                viewHolder.tvContent.setText(tweet.getContent());
+                viewHolder.tvPostTime.setText(DateUtils.getRelativeTimeSpanString(
+                        LocalDateTime.parse(tweet.getPostTime()).toDateTime().getMillis(),
+                        now, 0, DateUtils.FORMAT_ABBREV_RELATIVE));
+                if (tweet.getImageUrl() != null) {
+                    viewHolder.ivPhoto.setAdapter(new ImageAdapter(tweet.getImageUrl()));
+                }
+                viewHolder.ibComment.setOnClickListener(this);
+                viewHolder.ibComment.setTag(pos);
+            }
+
         }
-        viewHolder.ibComment.setOnClickListener(this);
-        viewHolder.ibComment.setTag(i);
+        else {
+            pos = i;
+            long now = LocalDateTime.now().toDateTime().getMillis();
+            final Tweet tweet = tweets.get(pos);
+            ViewHolder viewHolder = (ViewHolder) vh;
+            runEnterAnimation(viewHolder.itemView, pos);
+
+            ImageLoader.getInstance().displayImage(tweet.getPoster().getAvatar(), viewHolder.ivAvatar);
+            viewHolder.tvNickname.setText(tweet.getPoster().getNickName());
+            viewHolder.tvContent.setText(tweet.getContent());
+            viewHolder.tvPostTime.setText(DateUtils.getRelativeTimeSpanString(
+                    LocalDateTime.parse(tweet.getPostTime()).toDateTime().getMillis(),
+                    now, 0, DateUtils.FORMAT_ABBREV_RELATIVE));
+            if (tweet.getImageUrl() != null) {
+                viewHolder.ivPhoto.setAdapter(new ImageAdapter(tweet.getImageUrl()));
+            }
+            viewHolder.cbLike.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    AVUser user = AVUser.getCurrentUser();
+                    AVRelation<AVObject> relation = user.getRelation("likes");
+                    if (isChecked) {
+                        relation.add(tweet);
+                    } else {
+                        relation.remove(tweet);
+                    }
+                    user.saveInBackground();
+
+                }
+            });
+            viewHolder.ibComment.setOnClickListener(this);
+            viewHolder.ibComment.setTag(pos);
+        }
+
 
 
     }
@@ -101,6 +178,10 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
 
     public void updateItems() {
         itemsCount = tweets.size();
+
+        if (mUserHeader) {
+            itemsCount++;
+        }
         notifyDataSetChanged();
     }
 
@@ -127,7 +208,7 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
         private TextView tvContent;
         private GridView ivPhoto;
         private TextView tvPostTime;
-        private ImageView ibLike;
+        private CheckBox cbLike;
         private ImageView ibComment;
 
         /**
@@ -142,10 +223,11 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
             tvContent = (TextView) itemView.findViewById(R.id.tv_content);
             ivPhoto = (GridView) itemView.findViewById(R.id.iv_photo);
             tvPostTime = (TextView) itemView.findViewById(R.id.tv_post_time);
-            ibLike = (ImageView) itemView.findViewById(R.id.ib_like);
+            cbLike = (CheckBox) itemView.findViewById(R.id.cb_like);
+
             ibComment = (ImageView) itemView.findViewById(R.id.ib_comment);
 
-            ibLike.setOnClickListener(this);
+            cbLike.setOnClickListener(this);
             ibComment.setOnClickListener(this);
         }
 
@@ -157,12 +239,24 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
          */
         @Override
         public void onClick(View v) {
-            if (v == ibLike) {
-                // Handle clicks for ibLike
-            } else if (v == ibComment) {
+            if (v == ibComment) {
                 // Handle clicks for ibComment
             }
         }
+
+
+    }
+
+    public static class VHeader extends RecyclerView.ViewHolder{
+
+        private View mView;
+
+        public VHeader(View itemView) {
+            super(itemView);
+            mView = itemView;
+        }
+
+
 
 
     }

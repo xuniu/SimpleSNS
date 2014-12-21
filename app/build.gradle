@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.14.2'
+        classpath 'com.android.tools.build:gradle:0.14.+'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4+'
     }
 }
@@ -71,6 +71,7 @@ dependencies {
     compile 'joda-time:joda-time:2.5'
     compile 'com.melnykov:floatingactionbutton:1.1.0'
     compile 'com.github.ksoichiro:android-observablescrollview:1.2.0'
+    compile 'in.srain.cube:ultra-ptr:1.0.5@aar'
     compile project('libs:ResideMenu')
 
 }

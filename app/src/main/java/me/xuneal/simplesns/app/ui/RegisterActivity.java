@@ -65,8 +65,10 @@ public class RegisterActivity extends ActionBarActivity {
                         if (user != null) {
                             // 登录成功
                             startActivity(new Intent(RegisterActivity.this, MainActivity.class));
+                            finish();
                         } else {
                             // 登录失败
+                            Toast.makeText(RegisterActivity.this, "Register failed", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

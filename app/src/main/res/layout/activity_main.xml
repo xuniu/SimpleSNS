@@ -6,13 +6,14 @@
                 android:background="@color/silver"
                 tools:context=".MainActivity">
 
-    <include layout="@layout/toolbar_actionbar"/>
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/sr_root"
-        android:layout_below="@+id/toolbar_actionbar"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
+    <include layout="@layout/toolbar_image_logo"/>
+
+
+        <in.srain.cube.views.ptr.PtrFrameLayout
+                android:id="@+id/ptr_frame"
+                android:layout_below="@+id/toolbar_actionbar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
     <!-- A RecyclerView with some commonly used attributes -->
     <com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView
@@ -20,7 +21,7 @@
             android:scrollbars="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-    </android.support.v4.widget.SwipeRefreshLayout>
+</in.srain.cube.views.ptr.PtrFrameLayout>
 
     <com.melnykov.fab.FloatingActionButton
         android:id="@+id/fab"
@@ -31,8 +32,8 @@
         android:layout_alignParentRight="true"
         android:layout_margin="16dp"
         android:src="@drawable/ic_action_new"
-        fab:fab_colorNormal="@color/color_primary"
-        fab:fab_colorPressed="@color/color_primary_darker"
+        fab:fab_colorNormal="@color/color_accent"
+        fab:fab_colorPressed="@color/color_fallback"
         />
 
 </RelativeLayout>

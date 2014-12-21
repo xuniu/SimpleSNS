@@ -88,7 +88,7 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
         findViewById(R.id.tv_register).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                attemptLoginOrRegister();
+                startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
             }
         });
 

@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.*;
 import android.view.*;
 import android.view.animation.OvershootInterpolator;
@@ -14,6 +13,9 @@ import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
 import com.melnykov.fab.FloatingActionButton;
 import com.special.ResideMenu.ResideMenu;
 import com.special.ResideMenu.ResideMenuItem;
+import in.srain.cube.views.ptr.PtrFrameLayout;
+import in.srain.cube.views.ptr.PtrHandler;
+import in.srain.cube.views.ptr.header.MaterialHeader;
 import me.xuneal.simplesns.app.R;
 import me.xuneal.simplesns.app.model.Account;
 import me.xuneal.simplesns.app.model.Tweet;
@@ -34,12 +36,11 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
     private TweetAdapter mTweetAdapter;
     private MenuItem profileMenuItem;
     private ImageView mLogo;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-
     private FloatingActionButton fab;
 
     boolean pendingIntroAnimation;
     private ResideMenu mResideMenu;
+    private PtrFrameLayout mPtrFrame;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +48,8 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
         AVAnalytics.trackAppOpened(getIntent());
         setContentView(R.layout.activity_main);
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.sr_root);
         mRecyclerView = (ObservableRecyclerView) findViewById(R.id.my_recycler_view);
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mTweetAdapter = new TweetAdapter(this, new ArrayList<Tweet>());
@@ -72,11 +73,7 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
         }
 
         mRecyclerView.setAdapter(mTweetAdapter);
-        if (AVUser.getCurrentUser() == null){
-            startActivity(new Intent(this, LoginActivity.class));
-        } else {
-            loadData();
-        }
+
 
         mTweetAdapter.setOnFeedItemClickListener(this);
 
@@ -87,7 +84,7 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
 
         // create menu items;
         String titles[] = { "Profile", "Setting", "About Me",  };
-        int icon[] = { R.drawable.ic_avatar, R.drawable.ic_setting, R.drawable.ic_about};
+        int icon[] = { R.drawable.ic_profile, R.drawable.ic_setting, R.drawable.ic_about};
 
         for (int i = 0; i < titles.length; i++){
             ResideMenuItem item = new ResideMenuItem(this, icon[i], titles[i]);
@@ -109,16 +106,55 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
         });
 
 
+         mPtrFrame = (PtrFrameLayout) findViewById(R.id.ptr_frame);
+
+        // header
+        final MaterialHeader header = new MaterialHeader(this);
+        int[] colors = getResources().getIntArray(R.array.google_colors);
+        header.setColorSchemeColors(colors);
+        header.setLayoutParams(new PtrFrameLayout.LayoutParams(-1, -2));
+        header.setPadding(0, Utils.dpToPx(15), 0, Utils.dpToPx(10));
+        header.setPtrFrameLayout(mPtrFrame);
+
+        mPtrFrame.setLoadingMinTime(1000);
+        mPtrFrame.setDurationToCloseHeader(1500);
+        mPtrFrame.setHeaderView(header);
+        mPtrFrame.addPtrUIHandler(header);
+        mPtrFrame.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mPtrFrame.autoRefresh(true);
+            }
+        }, 100);
+
+        mPtrFrame.setPtrHandler(new PtrHandler() {
+            @Override
+            public boolean checkCanDoRefresh(PtrFrameLayout frame, View content, View header) {
+                return true;
+            }
+
+            @Override
+            public void onRefreshBegin(final PtrFrameLayout frame) {
+                if (AVUser.getCurrentUser() == null) {
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                } else {
+                    loadData();
+                }
+            }
+        });
     }
 
     private void loadData(){
-        mSwipeRefreshLayout.setRefreshing(true);
+
 
         AVQuery<Tweet> query = AVObject.getQuery(Tweet.class);
         query.include("images");
+        query.orderByDescending("updatedAt");
+        query.include(Tweet.POSTER);
         query.findInBackground(new FindCallback<Tweet>() {
             @Override
             public void done(List<Tweet> tweets, AVException e) {
+                mPtrFrame.refreshComplete();
                 if (tweets==null) return;
                 mTweetAdapter.getTweets().addAll(tweets);
                 mTweetAdapter.notifyDataSetChanged();

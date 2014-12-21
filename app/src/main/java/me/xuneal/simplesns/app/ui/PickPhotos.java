@@ -6,40 +6,71 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ListAdapter;
 import me.xuneal.simplesns.app.R;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class PickPhotos extends ActionBarActivity {
+public class PickPhotos extends BaseActivity {
 
     private GridView mGridView;
-    private ImageWithCheckboxAdapter mImageWithCheckboxAdapter;
+    private ListAdapter mListAdapter;
     private List<String> mImageUrls = new ArrayList<>();
+    private boolean mIsSupportMultiSelected;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pick_photos);
 
-//        File storageDir = Environment.getExternalStoragePublicDirectory(
-//                Environment.DIRECTORY_DCIM);
-//        mImageUrls =  Arrays.asList(storageDir.list());
+        mGridView = (GridView)findViewById(R.id.gv_photos);
+
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
+
 
         Iterator<HashMap<String, String>> iterator = getImages().iterator();
         while (iterator.hasNext()){
             mImageUrls.add("file://" + iterator.next().get("data"));
         }
-        mImageWithCheckboxAdapter = new ImageWithCheckboxAdapter(this, mImageUrls);
-        mGridView = (GridView)findViewById(R.id.gv_photos);
-        mGridView.setAdapter(mImageWithCheckboxAdapter);
-        mGridView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE);
 
+        mIsSupportMultiSelected = getIntent().getBooleanExtra("is_multi_selected", false);
+        if (mIsSupportMultiSelected){
+            mListAdapter = new ImageWithCheckboxAdapter(this, mImageUrls);
+            mGridView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE);
+        } else {
+          mListAdapter = new ImageWithPickPhotoAdapter(this, mImageUrls);
+        }
+        mGridView.setAdapter(mListAdapter);
+        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (position==0){
+                    dispatchTakePictureIntent();
+                }
+                if (!mIsSupportMultiSelected) {
+                    mImageUrls.add((String) mListAdapter.getItem(position));
+                    Intent intent = getIntent();
+                    intent.putExtra("url", (String) mListAdapter.getItem(position));
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }
 
+            }
+        });
 
     }
 
@@ -64,11 +95,12 @@ public class PickPhotos extends ActionBarActivity {
             String[] urls = new String[mGridView.getCheckedItemCount()];
             int i=0;
             for (long itemId : mGridView.getCheckedItemIds()){
+                if (itemId ==0) continue;
                 urls[i] = mImageUrls.get((int)itemId-1);
                 i++;
             }
             intent.putExtra("urls", urls);
-            setResult(0, intent);
+            setResult(RESULT_OK, intent);
             finish();
         }
 
@@ -76,7 +108,7 @@ public class PickPhotos extends ActionBarActivity {
     }
 
 
-    public List<HashMap<String, String>> getImages() {
+    private List<HashMap<String, String>> getImages() {
         // 指定要查询的uri资源
         Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         // 获取ContentResolver
@@ -122,5 +154,46 @@ public class PickPhotos extends ActionBarActivity {
             cursor.close();
         }
         return imageList;
+    }
+
+    String mCurrentPhotoPath;
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
+        return image;
+    }
+
+    static final int REQUEST_TAKE_PHOTO = 1;
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                        Uri.fromFile(photoFile));
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            }
+        }
     }
 }
