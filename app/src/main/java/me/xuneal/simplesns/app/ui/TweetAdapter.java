@@ -15,6 +15,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import de.hdodenhof.circleimageview.CircleImageView;
 import me.xuneal.simplesns.app.R;
 import me.xuneal.simplesns.app.model.Tweet;
+import me.xuneal.simplesns.app.ui.components.ReverseInterpolator;
 import me.xuneal.simplesns.app.util.Utils;
 import org.joda.time.LocalDateTime;
 
@@ -78,7 +79,7 @@ public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View view;
-        if (getItemViewType(i) == 2){
+        if (i==2){
             view = mHeader;
             return new VHeader(view);
         }
@@ -161,6 +162,7 @@ public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     }
                     user.saveInBackground();
 
+                    buttonView.animate().scaleX(2.0f).setDuration(300).setInterpolator(new ReverseInterpolator()).start();
                 }
             });
             viewHolder.ibComment.setOnClickListener(this);

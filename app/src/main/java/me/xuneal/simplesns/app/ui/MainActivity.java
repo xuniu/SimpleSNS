@@ -153,9 +153,24 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
         query.include(Tweet.POSTER);
         query.findInBackground(new FindCallback<Tweet>() {
             @Override
-            public void done(List<Tweet> tweets, AVException e) {
+            public void done(final List<Tweet> tweets, AVException e) {
                 mPtrFrame.refreshComplete();
                 if (tweets==null) return;
+                AVUser user = AVUser.getCurrentUser();
+                AVRelation<AVObject> relation = user.getRelation("likes");
+                relation.getQuery().whereContainedIn("likes", tweets).findInBackground(new FindCallback<AVObject>() {
+                    @Override
+                    public void done(List<AVObject> list, AVException e) {
+                        for (AVObject post : list){
+
+                            for (Tweet tweet : tweets){
+                                if (post.getObjectId().equals(tweet.getObjectId())){
+                                    tweet.setLike(true);
+                                }
+                            }
+                        }
+                    }
+                });
                 mTweetAdapter.getTweets().addAll(tweets);
                 mTweetAdapter.notifyDataSetChanged();
             }

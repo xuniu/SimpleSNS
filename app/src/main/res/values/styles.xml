@@ -36,5 +36,8 @@
         <item name="android:elevation">@dimen/headerbar_elevation</item>
     </style>
 
+    <style name="LikeCheckbox" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/checkbox_style</item>
+    </style>
 
 </resources>

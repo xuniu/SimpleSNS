@@ -22,6 +22,16 @@ public class Tweet extends AVObject{
     public static final String IMAGES = "images";
     public static final String TABLE_NAME = "Tweets";
 
+    private boolean like;
+
+    public boolean isLike() {
+        return like;
+    }
+
+    public void setLike(boolean like) {
+        this.like = like;
+    }
+
     public Tweet(){}
 
     public String getContent() {
