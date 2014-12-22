@@ -12,9 +12,11 @@
 
     <!-- Include following permission if you want to cache images on SD card -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.SET_DEBUG_APP" />
 
-    <uses-feature android:name="android.hardware.camera"
-                  android:required="true" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
 
     <application
         android:name="me.xuneal.simplesns.app.MyApplication"
@@ -58,6 +60,14 @@
         <activity
             android:name="me.xuneal.simplesns.app.ui.RegisterActivity"
             android:label="@string/title_activity_register"
+            android:parentActivityName="me.xuneal.simplesns.app.ui.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="me.xuneal.simplesns.app.ui.MainActivity" />
+        </activity>
+        <activity
+            android:name="me.xuneal.simplesns.app.ui.AboutMeActivity"
+            android:label="@string/title_activity_about_me"
             android:parentActivityName="me.xuneal.simplesns.app.ui.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

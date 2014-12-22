@@ -9,11 +9,12 @@
     <include layout="@layout/toolbar_image_logo"/>
 
 
-        <in.srain.cube.views.ptr.PtrFrameLayout
-                android:id="@+id/ptr_frame"
-                android:layout_below="@+id/toolbar_actionbar"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+    <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/activity_main_swipe_refresh_layout"
+            android:layout_below="@+id/toolbar_actionbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
 
     <!-- A RecyclerView with some commonly used attributes -->
     <com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView
@@ -21,7 +22,7 @@
             android:scrollbars="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-</in.srain.cube.views.ptr.PtrFrameLayout>
+</android.support.v4.widget.SwipeRefreshLayout>
 
     <com.melnykov.fab.FloatingActionButton
         android:id="@+id/fab"

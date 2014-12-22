@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.*;
 import android.view.*;
 import android.view.animation.OvershootInterpolator;
@@ -41,6 +42,7 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
     boolean pendingIntroAnimation;
     private ResideMenu mResideMenu;
     private PtrFrameLayout mPtrFrame;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +86,7 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
 
         // create menu items;
         String titles[] = { "Profile", "Setting", "About Me",  };
-        int icon[] = { R.drawable.ic_profile, R.drawable.ic_setting, R.drawable.ic_about};
+        int icon[] = { R.drawable.ic_profile, R.drawable.ic_settings, R.drawable.ic_about_me};
 
         for (int i = 0; i < titles.length; i++){
             ResideMenuItem item = new ResideMenuItem(this, icon[i], titles[i]);
@@ -106,35 +108,36 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
         });
 
 
-         mPtrFrame = (PtrFrameLayout) findViewById(R.id.ptr_frame);
+         //mPtrFrame = (PtrFrameLayout) findViewById(R.id.ptr_frame);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);
 
         // header
-        final MaterialHeader header = new MaterialHeader(this);
-        int[] colors = getResources().getIntArray(R.array.google_colors);
-        header.setColorSchemeColors(colors);
-        header.setLayoutParams(new PtrFrameLayout.LayoutParams(-1, -2));
-        header.setPadding(0, Utils.dpToPx(15), 0, Utils.dpToPx(10));
-        header.setPtrFrameLayout(mPtrFrame);
+//        final MaterialHeader header = new MaterialHeader(this);
+//        int[] colors = getResources().getIntArray(R.array.google_colors);
+//        header.setColorSchemeColors(colors);
+//        header.setLayoutParams(new PtrFrameLayout.LayoutParams(-1, -2));
+//        header.setPadding(0, Utils.dpToPx(15), 0, Utils.dpToPx(10));
+//        header.setPtrFrameLayout(mPtrFrame);
 
-        mPtrFrame.setLoadingMinTime(1000);
-        mPtrFrame.setDurationToCloseHeader(1500);
-        mPtrFrame.setHeaderView(header);
-        mPtrFrame.addPtrUIHandler(header);
-        mPtrFrame.postDelayed(new Runnable() {
+//        mPtrFrame.setLoadingMinTime(1000);
+//        mPtrFrame.setDurationToCloseHeader(1500);
+//        mPtrFrame.setHeaderView(header);
+//        mPtrFrame.addPtrUIHandler(header);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.red, R.color.blue, R.color.yellow, R.color.green);
+        mSwipeRefreshLayout.postDelayed(new Runnable() {
             @Override
             public void run() {
-                mPtrFrame.autoRefresh(true);
+                mSwipeRefreshLayout.setRefreshing(true);
+                if (AVUser.getCurrentUser() == null) {
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                } else {
+                    loadData();
+                }
             }
-        }, 100);
-
-        mPtrFrame.setPtrHandler(new PtrHandler() {
+        }, 1000);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public boolean checkCanDoRefresh(PtrFrameLayout frame, View content, View header) {
-                return true;
-            }
-
-            @Override
-            public void onRefreshBegin(final PtrFrameLayout frame) {
+            public void onRefresh() {
                 if (AVUser.getCurrentUser() == null) {
                     startActivity(new Intent(MainActivity.this, LoginActivity.class));
                 } else {
@@ -142,6 +145,28 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
                 }
             }
         });
+//        mPtrFrame.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                mPtrFrame.autoRefresh(true);
+//            }
+//        }, 100);
+//
+//        mPtrFrame.setPtrHandler(new PtrHandler() {
+//            @Override
+//            public boolean checkCanDoRefresh(PtrFrameLayout frame, View content, View header) {
+//                return true;
+//            }
+//
+//            @Override
+//            public void onRefreshBegin(final PtrFrameLayout frame) {
+//                if (AVUser.getCurrentUser() == null) {
+//                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+//                } else {
+//                    loadData();
+//                }
+//            }
+//        });
     }
 
     private void loadData(){
@@ -154,11 +179,18 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
         query.findInBackground(new FindCallback<Tweet>() {
             @Override
             public void done(final List<Tweet> tweets, AVException e) {
-                mPtrFrame.refreshComplete();
+//                mPtrFrame.refreshComplete();
+                mSwipeRefreshLayout.setRefreshing(false);
                 if (tweets==null) return;
+
+                List<String> tweetIds = new ArrayList<String>(tweets.size());
+                for (Tweet tweet: tweets){
+                    tweetIds.add(tweet.getObjectId());
+                }
+                try {
                 AVUser user = AVUser.getCurrentUser();
                 AVRelation<AVObject> relation = user.getRelation("likes");
-                relation.getQuery().whereContainedIn("likeUser", tweets).findInBackground(new FindCallback<AVObject>() {
+                relation.getQuery().whereContainedIn("objectId", tweetIds).findInBackground(new FindCallback<AVObject>() {
                     @Override
                     public void done(List<AVObject> list, AVException e) {
                         for (AVObject post : list){
@@ -170,7 +202,8 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
                             }
                         }
                     }
-                });
+                });}
+                catch (Exception ignored){}
                 mTweetAdapter.getTweets().addAll(tweets);
                 mTweetAdapter.notifyDataSetChanged();
             }
@@ -309,6 +342,8 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
             case 0:
                 startActivity(new Intent(this, ProfileActivity.class));
                 break;
+            case 2:
+                startActivity(new Intent(this, AboutMeActivity.class));
             default:
                 break;
         }

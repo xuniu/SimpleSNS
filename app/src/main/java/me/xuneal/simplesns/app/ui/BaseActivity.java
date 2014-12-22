@@ -42,9 +42,9 @@ public class BaseActivity extends ActionBarActivity {
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
         getActionBarToolbar();
-        Toolbar.LayoutParams layoutParams = new Toolbar.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER);
-        getActionBarTextView().setLayoutParams(layoutParams);
+//        Toolbar.LayoutParams layoutParams = new Toolbar.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+//                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER);
+//        getActionBarTextView().setLayoutParams(layoutParams);
         getActionBarTextView().setTextColor(getResources().getColor(R.color.white));
     }
 }
