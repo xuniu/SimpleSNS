@@ -162,7 +162,7 @@ public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     }
                     user.saveInBackground();
 
-                    buttonView.animate().scaleX(2.0f).setDuration(300).setInterpolator(new ReverseInterpolator()).start();
+                    buttonView.animate().scaleX(1.5f).scaleY(1.5f).setDuration(300).setInterpolator(new ReverseInterpolator()).start();
                 }
             });
             viewHolder.ibComment.setOnClickListener(this);

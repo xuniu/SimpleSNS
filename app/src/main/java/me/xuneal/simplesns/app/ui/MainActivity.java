@@ -158,7 +158,7 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
                 if (tweets==null) return;
                 AVUser user = AVUser.getCurrentUser();
                 AVRelation<AVObject> relation = user.getRelation("likes");
-                relation.getQuery().whereContainedIn("likes", tweets).findInBackground(new FindCallback<AVObject>() {
+                relation.getQuery().whereContainedIn("likeUser", tweets).findInBackground(new FindCallback<AVObject>() {
                     @Override
                     public void done(List<AVObject> list, AVException e) {
                         for (AVObject post : list){
