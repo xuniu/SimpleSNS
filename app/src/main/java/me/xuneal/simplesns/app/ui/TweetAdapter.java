@@ -61,6 +61,8 @@ public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     public void setHeader(View view){
         mHeader = view;
+        mUserHeader = true;
+
     }
 
     public View getHeader() {

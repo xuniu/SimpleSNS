@@ -2,11 +2,14 @@ package me.xuneal.simplesns.app.ui;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.*;
+import android.util.Log;
 import android.view.*;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.*;
 import com.avos.avoscloud.*;
@@ -20,6 +23,8 @@ import in.srain.cube.views.ptr.header.MaterialHeader;
 import me.xuneal.simplesns.app.R;
 import me.xuneal.simplesns.app.model.Account;
 import me.xuneal.simplesns.app.model.Tweet;
+import me.xuneal.simplesns.app.ui.components.RainbowProgressbar;
+import me.xuneal.simplesns.app.ui.components.ResizeAnimation;
 import me.xuneal.simplesns.app.util.Utils;
 import org.joda.time.LocalDateTime;
 
@@ -43,6 +48,9 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
     private ResideMenu mResideMenu;
     private PtrFrameLayout mPtrFrame;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private RainbowProgressbar mRainbowProgressBar;
+    private ImageView mIvHeader;
+    private GestureDetector mGestureDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +63,82 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mTweetAdapter = new TweetAdapter(this, new ArrayList<Tweet>());
+        mRainbowProgressBar = (RainbowProgressbar) findViewById(R.id.rpb);
+        FrameLayout frameLayout = (FrameLayout) LayoutInflater.from(this).inflate(R.layout.item_header, null);
+        mIvHeader = (ImageView) frameLayout.findViewById(R.id.iv_header);
+        mTweetAdapter.setHeader(frameLayout);
+        mRecyclerView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == android.view.MotionEvent.ACTION_UP) {
+//                    ObjectAnimator heightAnim = ObjectAnimator.ofInt(mIvHeader, "height", 300);
+//                    mIvHeader.animate().scaleY(1).setDuration(100).setInterpolator(new AccelerateDecelerateInterpolator())
+//                            .start();
+                    ResizeAnimation animation = new ResizeAnimation(mIvHeader, Utils.dpToPx(300));
+                    animation.setDuration(200);
+                    mIvHeader.startAnimation(animation);
+//                    heightAnim.setDuration(100);
+//                    heightAnim.setInterpolator(new AccelerateDecelerateInterpolator());
+//                    heightAnim.start();
+                } else {
+                    mGestureDetector.onTouchEvent(event);
+                }
+                return false;
+            }
+        });
+        mGestureDetector = new GestureDetector(this, new GestureDetector.OnGestureListener() {
+
+            private float distanceY;
+
+            public float getDistanceY() {
+                return distanceY;
+            }
+
+            public void setDistanceY(float distanceY) {
+                this.distanceY = distanceY;
+            }
+
+            @Override
+            public boolean onDown(MotionEvent e) {
+                return false;
+            }
+
+            @Override
+            public void onShowPress(MotionEvent e) {
+
+            }
+
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                return false;
+            }
+
+            @Override
+            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                if (e2.getRawY()> e1.getRawY()){
+                    FrameLayout.LayoutParams layoutParams = new FrameLayout
+                            .LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                            mIvHeader.getHeight()-(int)(distanceY/2));
+                    mIvHeader.setLayoutParams(layoutParams);
+                    this.distanceY += distanceY;
+                    mRainbowProgressBar.setTranslationY(distanceY);
+//                    scaleTimes+=(distanceY/mIvHeader.getHeight()/(-1));
+//                    mIvHeader.animate().scaleY(scaleTimes).start();
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public void onLongPress(MotionEvent e) {
+
+            }
+
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                return false;
+            }
+        });
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -67,6 +151,13 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
         fab.attachToRecyclerView(mRecyclerView);
 
         mLogo = (ImageView) findViewById(R.id.logo);
+//        mRainbowProgressBar.setRefresh(true);
+//        mRainbowProgressBar.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                mRainbowProgressBar.setRefresh(false);
+//            }
+//        }, 120000);
 
         getActionBarToolbar().setNavigationIcon(R.drawable.ic_menu_white);
 
@@ -107,44 +198,34 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
             }
         });
 
+        loadData();
 
-         //mPtrFrame = (PtrFrameLayout) findViewById(R.id.ptr_frame);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);
 
-        // header
-//        final MaterialHeader header = new MaterialHeader(this);
-//        int[] colors = getResources().getIntArray(R.array.google_colors);
-//        header.setColorSchemeColors(colors);
-//        header.setLayoutParams(new PtrFrameLayout.LayoutParams(-1, -2));
-//        header.setPadding(0, Utils.dpToPx(15), 0, Utils.dpToPx(10));
-//        header.setPtrFrameLayout(mPtrFrame);
+//        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);
 
-//        mPtrFrame.setLoadingMinTime(1000);
-//        mPtrFrame.setDurationToCloseHeader(1500);
-//        mPtrFrame.setHeaderView(header);
-//        mPtrFrame.addPtrUIHandler(header);
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.red, R.color.blue, R.color.yellow, R.color.green);
-        mSwipeRefreshLayout.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mSwipeRefreshLayout.setRefreshing(true);
-                if (AVUser.getCurrentUser() == null) {
-                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                } else {
-                    loadData();
-                }
-            }
-        }, 1000);
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                if (AVUser.getCurrentUser() == null) {
-                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                } else {
-                    loadData();
-                }
-            }
-        });
+
+//        mSwipeRefreshLayout.setColorSchemeResources(R.color.red, R.color.blue, R.color.yellow, R.color.green);
+//        mSwipeRefreshLayout.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                mSwipeRefreshLayout.setRefreshing(true);
+//                if (AVUser.getCurrentUser() == null) {
+//                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+//                } else {
+//                    loadData();
+//                }
+//            }
+//        }, 1000);
+//        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//            @Override
+//            public void onRefresh() {
+//                if (AVUser.getCurrentUser() == null) {
+//                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+//                } else {
+//                    loadData();
+//                }
+//            }
+//        });
 //        mPtrFrame.postDelayed(new Runnable() {
 //            @Override
 //            public void run() {
@@ -180,7 +261,7 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
             @Override
             public void done(final List<Tweet> tweets, AVException e) {
 //                mPtrFrame.refreshComplete();
-                mSwipeRefreshLayout.setRefreshing(false);
+               // mSwipeRefreshLayout.setRefreshing(false);
                 if (tweets==null) return;
 
                 List<String> tweetIds = new ArrayList<String>(tweets.size());
