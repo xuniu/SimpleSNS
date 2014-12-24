@@ -22,6 +22,7 @@ public class MyApplication extends Application {
         //如果使用美国节点，请加上这行代码 AVOSCloud.useAVCloudUS();
         AVObject.registerSubclass(Tweet.class);
         AVObject.registerSubclass(Comment.class);
+        AVOSCloud.setDebugLogEnabled(true);
         AVOSCloud.initialize(this, "6wget8cpw4yfez0tp1txqtx6wrjelkpg898m4j7shc3xoe2e", "upfiubxw7w1vzpn8qvn305pml2p7del2k9s5npcihokvb2mq");
         // Create global configuration and initialize ImageLoader with this config
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)

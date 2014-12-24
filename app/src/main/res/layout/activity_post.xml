@@ -27,17 +27,11 @@
         android:layout_width="match_parent"
         android:layout_marginTop="8dp"
         android:numColumns="3"
-        android:verticalSpacing="8dp"
-        android:horizontalSpacing="8dp"
-        android:gravity="center"
+        android:verticalSpacing="3dp"
+        android:horizontalSpacing="3dp"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_margin="3dp"
         />
-
-
-
 
 
 </RelativeLayout>

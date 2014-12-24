@@ -6,7 +6,6 @@
                 android:background="@color/silver"
                 tools:context=".MainActivity">
 
-    <include layout="@layout/toolbar_image_logo"/>
 
 
     <!--<android.support.v4.widget.SwipeRefreshLayout-->
@@ -22,7 +21,9 @@
             android:layout_below="@+id/toolbar_actionbar"
             android:scrollbars="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:background="@color/color_bg"
+        />
 <!--</android.support.v4.widget.SwipeRefreshLayout>-->
 
     <com.melnykov.fab.FloatingActionButton
@@ -42,9 +43,10 @@
             android:id="@+id/rpb"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
-            android:layout_margin="98dp"
+            android:layout_below="@+id/toolbar_actionbar"
+            android:layout_margin="50dp"
             />
+    <include layout="@layout/toolbar_image_logo"/>
 
 </RelativeLayout>

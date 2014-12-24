@@ -89,6 +89,8 @@ public class CommentsActivity extends BaseActivity implements View.OnClickListen
         mRvComments.setLayoutManager(new LinearLayoutManager(this));
         mCommentAdapter = new CommentAdapter(mComments);
         mRvComments.setAdapter(mCommentAdapter);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         drawingStartLocation = getIntent().getIntExtra(ARG_DRAWING_START_LOCATION, 0);
         AVQuery<Tweet> query = new AVQuery<Tweet>(Tweet.TABLE_NAME);
@@ -183,7 +185,8 @@ public class CommentsActivity extends BaseActivity implements View.OnClickListen
             mCommentAdapter.addItem(comment);
             mCommentAdapter.setAnimationsLocked(false);
             mCommentAdapter.setDelayEnterAnimation(false);
-            mRvComments.smoothScrollBy(0, mRvComments.getChildAt(0).getHeight() * mCommentAdapter.getItemCount());
+            if (mRvComments.getChildCount()>1)
+                mRvComments.smoothScrollBy(0, mRvComments.getChildAt(0).getHeight() * mCommentAdapter.getItemCount());
 
             mComment.setText(null);
             mSend.setCurrentState(SendCommentButton.STATE_DONE);

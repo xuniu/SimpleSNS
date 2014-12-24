@@ -9,7 +9,6 @@
         android:layout_height="300dp"
         android:src="@drawable/img_header"
         android:scaleType="centerCrop"
-        android:clickable="true"
-        android:focusable="true"
+        android:clickable="false"
         />
 </FrameLayout>

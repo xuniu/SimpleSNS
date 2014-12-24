@@ -1,9 +1,11 @@
 package me.xuneal.simplesns.app.ui;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import com.flaviofaria.kenburnsview.KenBurnsView;
 import me.xuneal.simplesns.app.R;
 
 public class SplashActivity extends ActionBarActivity {
@@ -12,6 +14,15 @@ public class SplashActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+        KenBurnsView kenBurnsView = (KenBurnsView)findViewById(R.id.kbv_image);
+        kenBurnsView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                SplashActivity.this.finish();
+
+            }
+        }, 1500);
     }
 
 

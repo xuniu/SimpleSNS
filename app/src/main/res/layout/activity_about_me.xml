@@ -29,12 +29,15 @@
     <ImageView
             android:layout_below="@id/title"
             android:layout_centerHorizontal="true"
-            android:layout_width="18dp" android:layout_height="18dp"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_margin="7dp"
             android:src="@drawable/ic_launcher"/>
     <TextView
             android:layout_below="@id/split_line"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autoLink="email"
             android:text="I'm a Senior Android Developer who is looking for a remote work,If you like me, Pls send me a mail to imxuneal@gmail.com"
             />
 

@@ -13,7 +13,7 @@
              which is used to tint widgets -->
         <item name="colorAccent">@color/color_accent</item>
         <item name="actionMenuTextColor">@android:color/white</item>
-
+        <item name="android:windowBackground">@color/color_bg</item>
         <!-- You can also set colorControlNormal, colorControlActivated
              colorControlHighlight, and colorSwitchThumbNormal. -->
     </style>

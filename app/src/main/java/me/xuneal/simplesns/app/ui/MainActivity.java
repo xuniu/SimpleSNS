@@ -2,14 +2,13 @@ package me.xuneal.simplesns.app.ui;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
+import android.app.DialogFragment;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.*;
-import android.util.Log;
 import android.view.*;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.*;
 import com.avos.avoscloud.*;
@@ -18,8 +17,6 @@ import com.melnykov.fab.FloatingActionButton;
 import com.special.ResideMenu.ResideMenu;
 import com.special.ResideMenu.ResideMenuItem;
 import in.srain.cube.views.ptr.PtrFrameLayout;
-import in.srain.cube.views.ptr.PtrHandler;
-import in.srain.cube.views.ptr.header.MaterialHeader;
 import me.xuneal.simplesns.app.R;
 import me.xuneal.simplesns.app.model.Account;
 import me.xuneal.simplesns.app.model.Tweet;
@@ -71,72 +68,33 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == android.view.MotionEvent.ACTION_UP) {
-//                    ObjectAnimator heightAnim = ObjectAnimator.ofInt(mIvHeader, "height", 300);
-//                    mIvHeader.animate().scaleY(1).setDuration(100).setInterpolator(new AccelerateDecelerateInterpolator())
-//                            .start();
                     ResizeAnimation animation = new ResizeAnimation(mIvHeader, Utils.dpToPx(300));
                     animation.setDuration(200);
                     mIvHeader.startAnimation(animation);
-//                    heightAnim.setDuration(100);
-//                    heightAnim.setInterpolator(new AccelerateDecelerateInterpolator());
-//                    heightAnim.start();
+                    mRainbowProgressBar.touchRelease();
+
                 } else {
                     mGestureDetector.onTouchEvent(event);
                 }
                 return false;
             }
         });
-        mGestureDetector = new GestureDetector(this, new GestureDetector.OnGestureListener() {
 
-            private float distanceY;
-
-            public float getDistanceY() {
-                return distanceY;
-            }
-
-            public void setDistanceY(float distanceY) {
-                this.distanceY = distanceY;
-            }
-
-            @Override
-            public boolean onDown(MotionEvent e) {
-                return false;
-            }
-
-            @Override
-            public void onShowPress(MotionEvent e) {
-
-            }
-
-            @Override
-            public boolean onSingleTapUp(MotionEvent e) {
-                return false;
-            }
+        mGestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
 
             @Override
             public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                if (e2==null || e1==null) return false;
                 if (e2.getRawY()> e1.getRawY()){
                     FrameLayout.LayoutParams layoutParams = new FrameLayout
                             .LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
                             mIvHeader.getHeight()-(int)(distanceY/2));
                     mIvHeader.setLayoutParams(layoutParams);
-                    this.distanceY += distanceY;
-                    mRainbowProgressBar.setTranslationY(distanceY);
-//                    scaleTimes+=(distanceY/mIvHeader.getHeight()/(-1));
-//                    mIvHeader.animate().scaleY(scaleTimes).start();
+                    mRainbowProgressBar.setScrollDistance((int)distanceY);
+
                     return true;
                 }
-                return false;
-            }
-
-            @Override
-            public void onLongPress(MotionEvent e) {
-
-            }
-
-            @Override
-            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                return false;
+                return super.onScroll(e1, e2, distanceX, distanceY);
             }
         });
 
@@ -151,13 +109,19 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
         fab.attachToRecyclerView(mRecyclerView);
 
         mLogo = (ImageView) findViewById(R.id.logo);
-//        mRainbowProgressBar.setRefresh(true);
-//        mRainbowProgressBar.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                mRainbowProgressBar.setRefresh(false);
-//            }
-//        }, 120000);
+
+        mRainbowProgressBar.setOnRefreshListener(new RainbowProgressbar.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mRainbowProgressBar.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mRainbowProgressBar.setRefresh(false);
+                    }
+                }, 4000);
+            }
+        });
+
 
         getActionBarToolbar().setNavigationIcon(R.drawable.ic_menu_white);
 
@@ -166,7 +130,6 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
         }
 
         mRecyclerView.setAdapter(mTweetAdapter);
-
 
         mTweetAdapter.setOnFeedItemClickListener(this);
 
@@ -189,7 +152,7 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
         getActionBarToolbar().setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mResideMenu.isOpened()){
+                if (mResideMenu.isOpened()) {
                     mResideMenu.closeMenu();
                 } else {
                     mResideMenu.openMenu(ResideMenu.DIRECTION_LEFT);
@@ -199,55 +162,6 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
         });
 
         loadData();
-
-
-//        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);
-
-
-//        mSwipeRefreshLayout.setColorSchemeResources(R.color.red, R.color.blue, R.color.yellow, R.color.green);
-//        mSwipeRefreshLayout.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                mSwipeRefreshLayout.setRefreshing(true);
-//                if (AVUser.getCurrentUser() == null) {
-//                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
-//                } else {
-//                    loadData();
-//                }
-//            }
-//        }, 1000);
-//        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-//            @Override
-//            public void onRefresh() {
-//                if (AVUser.getCurrentUser() == null) {
-//                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
-//                } else {
-//                    loadData();
-//                }
-//            }
-//        });
-//        mPtrFrame.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                mPtrFrame.autoRefresh(true);
-//            }
-//        }, 100);
-//
-//        mPtrFrame.setPtrHandler(new PtrHandler() {
-//            @Override
-//            public boolean checkCanDoRefresh(PtrFrameLayout frame, View content, View header) {
-//                return true;
-//            }
-//
-//            @Override
-//            public void onRefreshBegin(final PtrFrameLayout frame) {
-//                if (AVUser.getCurrentUser() == null) {
-//                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
-//                } else {
-//                    loadData();
-//                }
-//            }
-//        });
     }
 
     private void loadData(){
@@ -260,8 +174,8 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
         query.findInBackground(new FindCallback<Tweet>() {
             @Override
             public void done(final List<Tweet> tweets, AVException e) {
-//                mPtrFrame.refreshComplete();
-               // mSwipeRefreshLayout.setRefreshing(false);
+
+                mRainbowProgressBar.setRefresh(false);
                 if (tweets==null) return;
 
                 List<String> tweetIds = new ArrayList<String>(tweets.size());
@@ -282,11 +196,13 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
                                 }
                             }
                         }
+
+                        mTweetAdapter.getTweets().addAll(tweets);
+                        mTweetAdapter.updateItems();
                     }
                 });}
                 catch (Exception ignored){}
-                mTweetAdapter.getTweets().addAll(tweets);
-                mTweetAdapter.notifyDataSetChanged();
+
             }
         });
     }
@@ -406,6 +322,14 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
 
 
     @Override
+    public void onImageClick(List<String> imageUrls, int pos) {
+        GalleryFragment fragment = GalleryFragment.newInstance(new ArrayList<String>(imageUrls), pos);
+        fragment.setCancelable(true);
+        fragment.setStyle(DialogFragment.STYLE_NO_TITLE | DialogFragment.STYLE_NO_FRAME, android.R.style.Theme_NoTitleBar_Fullscreen );
+        fragment.show(getSupportFragmentManager(), "gallery");
+    }
+
+    @Override
     public void onCommentsClick(View v, int position) {
         Intent intent = new Intent(this, CommentsActivity.class);
         int[] startingLocation = new int[2];
@@ -422,9 +346,11 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
         switch (id ){
             case 0:
                 startActivity(new Intent(this, ProfileActivity.class));
+                mResideMenu.closeMenu();
                 break;
             case 2:
                 startActivity(new Intent(this, AboutMeActivity.class));
+                mResideMenu.closeMenu();
             default:
                 break;
         }

@@ -43,17 +43,18 @@ class ImageAdapter extends BaseAdapter {
 
         } else {
             convertView = new SquareImageView(parent.getContext());
-            ((SquareImageView)convertView).setScaleType(ImageView.ScaleType.CENTER_CROP);
+            AbsListView.LayoutParams layoutParams = new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, AbsListView.LayoutParams.MATCH_PARENT);
+            convertView.setLayoutParams(layoutParams);
+                    ((SquareImageView) convertView).setScaleType(ImageView.ScaleType.CENTER_CROP);
             viewHolder = new ViewHolder();
             viewHolder.mImageView = (SquareImageView) convertView;
+            viewHolder.mImageView.setClickable(false);
+            viewHolder.mImageView.setFocusable(false);
+            convertView.setTag(viewHolder);
 
         }
-        String filename = "";
-        if (position != mImageUrls.size()-1){
-            filename = "file://" + mImageUrls.get(position);
-        } else {
-            filename = mImageUrls.get(position);
-        }
+        String filename = mImageUrls.get(position);
+
         ImageLoader.getInstance().displayImage(filename, viewHolder.mImageView);
 
         return convertView;

@@ -19,6 +19,7 @@ import me.xuneal.simplesns.app.ui.components.ReverseInterpolator;
 import me.xuneal.simplesns.app.util.Utils;
 import org.joda.time.LocalDateTime;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -117,62 +118,68 @@ public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         if (mUserHeader){
             pos = i-1;
             if (i!=0){
-                long now = LocalDateTime.now().toDateTime().getMillis();
-                Tweet tweet = tweets.get(pos);
-                ViewHolder viewHolder = (ViewHolder) vh;
-                runEnterAnimation(viewHolder.itemView, pos);
-
-                ImageLoader.getInstance().displayImage(tweet.getPoster().getAvatar(), viewHolder.ivAvatar);
-                viewHolder.tvNickname.setText(tweet.getPoster().getNickName());
-                viewHolder.tvContent.setText(tweet.getContent());
-                viewHolder.tvPostTime.setText(DateUtils.getRelativeTimeSpanString(
-                        LocalDateTime.parse(tweet.getPostTime()).toDateTime().getMillis(),
-                        now, 0, DateUtils.FORMAT_ABBREV_RELATIVE));
-                if (tweet.getImageUrl() != null) {
-                    viewHolder.ivPhoto.setAdapter(new ImageAdapter(tweet.getImageUrl()));
-                }
-                viewHolder.ibComment.setOnClickListener(this);
-                viewHolder.ibComment.setTag(pos);
+                bindViewHolder((ViewHolder)vh, pos);
             }
 
         }
         else {
             pos = i;
-            long now = LocalDateTime.now().toDateTime().getMillis();
-            final Tweet tweet = tweets.get(pos);
-            ViewHolder viewHolder = (ViewHolder) vh;
-            runEnterAnimation(viewHolder.itemView, pos);
-
-            ImageLoader.getInstance().displayImage(tweet.getPoster().getAvatar(), viewHolder.ivAvatar);
-            viewHolder.tvNickname.setText(tweet.getPoster().getNickName());
-            viewHolder.tvContent.setText(tweet.getContent());
-            viewHolder.tvPostTime.setText(DateUtils.getRelativeTimeSpanString(
-                    LocalDateTime.parse(tweet.getPostTime()).toDateTime().getMillis(),
-                    now, 0, DateUtils.FORMAT_ABBREV_RELATIVE));
-            if (tweet.getImageUrl() != null) {
-                viewHolder.ivPhoto.setAdapter(new ImageAdapter(tweet.getImageUrl()));
-            }
-            viewHolder.cbLike.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    AVUser user = AVUser.getCurrentUser();
-                    AVRelation<AVObject> relation = user.getRelation("likes");
-                    if (isChecked) {
-                        relation.add(tweet);
-                    } else {
-                        relation.remove(tweet);
-                    }
-                    user.saveInBackground();
-
-                    buttonView.animate().scaleX(1.5f).scaleY(1.5f).setDuration(300).setInterpolator(new ReverseInterpolator()).start();
-                }
-            });
-            viewHolder.ibComment.setOnClickListener(this);
-            viewHolder.ibComment.setTag(pos);
+            bindViewHolder((ViewHolder) vh, pos);
         }
+    }
 
+    private void bindViewHolder(ViewHolder vh, int pos) {
+        long now = LocalDateTime.now().toDateTime().getMillis();
+        final Tweet tweet = tweets.get(pos);
+        ViewHolder viewHolder = vh;
+        runEnterAnimation(viewHolder.itemView, pos);
 
+        ImageLoader.getInstance().displayImage(tweet.getPoster().getAvatar(), viewHolder.ivAvatar);
+        viewHolder.tvNickname.setText(tweet.getPoster().getNickName());
+        viewHolder.tvContent.setText(tweet.getContent());
+        viewHolder.tvPostTime.setText(DateUtils.getRelativeTimeSpanString(
+                LocalDateTime.parse(tweet.getPostTime()).toDateTime().getMillis(),
+                now, 0, DateUtils.FORMAT_ABBREV_RELATIVE));
+        if (tweet.getImageUrl() != null) {
+            viewHolder.ivPhoto.setAdapter(new ImageAdapter(tweet.getImageUrl()));
+        }
+        viewHolder.cbLike.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                AVUser user = AVUser.getCurrentUser();
+                AVRelation<AVObject> relation = user.getRelation("likes");
+                if (isChecked) {
+                    relation.add(tweet);
+                } else {
+                    relation.remove(tweet);
+                }
+                user.saveInBackground();
 
+                buttonView.animate().scaleX(1.5f).scaleY(1.5f).setDuration(300).setInterpolator(new ReverseInterpolator()).start();
+            }
+        });
+        viewHolder.cbLike.setChecked(tweet.isLike());
+        viewHolder.ibComment.setOnClickListener(this);
+        viewHolder.ibComment.setTag(pos);
+        adjustGridViewColumnNum(viewHolder.ivPhoto, tweets.size());
+        viewHolder.ivPhoto.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (mOnFeedItemClickListener!=null){
+                    mOnFeedItemClickListener.onImageClick(tweet.getImageUrl(), position);
+                }
+            }
+        });
+    }
+
+    private void adjustGridViewColumnNum(GridView gridView, int childNum){
+        if (childNum<3){
+            gridView.setNumColumns(childNum);
+        } else if (childNum==4) {
+            gridView.setNumColumns(2);
+        } else {
+            gridView.setColumnWidth(3);
+        }
     }
 
     @Override
@@ -266,6 +273,7 @@ public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     public interface OnFeedItemClickListener {
+        public void onImageClick(List<String> imageUrls, int pos);
         public void onCommentsClick(View v, int position);
     }
 }

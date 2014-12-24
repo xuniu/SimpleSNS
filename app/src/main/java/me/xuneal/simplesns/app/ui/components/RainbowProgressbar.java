@@ -21,12 +21,27 @@ public class RainbowProgressbar extends View {
     Runnable runnable = new Runnable() {
         @Override
         public void run() {
+            if (mDegree>=360){
+                mDegree=0;
+            } else {
+                mDegree+=10;
+            }
             RainbowProgressbar.this.invalidate();
             if (mRefresh)
                 RainbowProgressbar.this.postDelayed(this, 20);
         }
     };
     private int mTranslationY;
+    private int mTransled;
+    OnRefreshListener mOnRefreshListener;
+
+    public OnRefreshListener getOnRefreshListener() {
+        return mOnRefreshListener;
+    }
+
+    public void setOnRefreshListener(OnRefreshListener onRefreshListener) {
+        mOnRefreshListener = onRefreshListener;
+    }
 
     public RainbowProgressbar(Context context) {
         super(context);
@@ -52,34 +67,59 @@ public class RainbowProgressbar extends View {
 
     public void init() {
         mDrawBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.img_rainbow);
-        mTranslationY = Utils.dpToPx(32+50+48) * -1;
+        mTranslationY = Utils.dpToPx(32+50) * -1;
         ViewHelper.setTranslationY(this, mTranslationY);
     }
 
-    public void setTranslationY(int translationY){
-        Log.d("RAINBOW", String.valueOf(translationY));
-        if (Math.abs(translationY*3)<= Math.abs(mTranslationY)) {
-            ViewHelper.setTranslationY(this, mTranslationY + Math.abs(translationY*3));
-            if (mDegree<=0){
-                mDegree=360;
-            } else {
-                mDegree -=10;
-            }
+    public void setScrollDistance(int scrollDistance){
+        if (mRefresh) return;
+        if (Math.abs(mTransled + scrollDistance)<= Math.abs(mTranslationY)) {
+            mTransled += (scrollDistance);
+            ViewHelper.setTranslationY(this, mTranslationY + Math.abs(mTransled));
+
+        }
+        if (mDegree <= 0) {
+            mDegree = 360;
         } else {
+            mDegree -= 10;
+        }
+        invalidate();
+
+//        } else {
+//            if (mOnRefreshListener!=null) mOnRefreshListener.onRefresh();
+//            if (!mRefresh) {
+//                mRefresh = true;
+//                postDelayed(runnable, 20);
+//            }
+//        }
+    }
+
+    public void touchRelease(){
+        if (Math.abs(mTransled) >= Math.abs(mTranslationY) && !mRefresh) {
+            if (mOnRefreshListener!=null) mOnRefreshListener.onRefresh();
             if (!mRefresh) {
                 mRefresh = true;
                 postDelayed(runnable, 20);
             }
+        } else if (!mRefresh) {
+            animate().translationY(mTranslationY);
         }
     }
 
 
     public void setRefresh(boolean refresh){
-        mRefresh = refresh;
         if (refresh){
-        this.postDelayed(runnable, 20);
+            mRefresh = refresh;
+            animate().translationY(0).setDuration(100).start();
+            this.postDelayed(runnable, 20);
             } else {
-            animate().translationY(-1* Utils.dpToPx(32+50+48));
+            animate().translationY(-1* Utils.dpToPx(32+50)).withEndAction(new Runnable() {
+                @Override
+                public void run() {
+                    mRefresh = false;
+                }
+            });
+            mTransled=0;
         }
 
     }
@@ -92,11 +132,11 @@ public class RainbowProgressbar extends View {
 
         canvas.drawBitmap(mDrawBitmap,0,0,null);
         canvas.restore();
-        if (mDegree>=360){
-            mDegree=0;
-        } else {
-            mDegree+=10;
-        }
 
+
+    }
+
+    public interface OnRefreshListener{
+        void onRefresh();
     }
 }

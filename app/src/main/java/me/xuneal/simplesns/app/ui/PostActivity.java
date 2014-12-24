@@ -52,7 +52,7 @@ public class PostActivity extends BaseActivity  {
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         findViews();
-        mImageUrls.add("assets://ic_add.png");
+        mImageUrls.add("assets://ic_add_photo.png");
         mAdapter = new ImageAdapter(mImageUrls);
         images.setAdapter(mAdapter);
         images.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -60,9 +60,7 @@ public class PostActivity extends BaseActivity  {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position== parent.getCount()-1){
                     Intent intent = new Intent(PostActivity.this, PickPhotos.class);
-//                    intent.setType("image/*");
-//                    intent.setAction(Intent.ACTION_GET_CONTENT);
-//                    startActivityForResult(Intent.createChooser(intent, "Select Picture"), 0);
+                    intent.putExtra("is_multi_selected", true);
                     startActivityForResult(intent, 0);
                 }
             }
@@ -102,24 +100,13 @@ public class PostActivity extends BaseActivity  {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK && requestCode == 0&& data != null && data.getData() != null){
-
-//            Uri _uri = data.getData();
-//
-//            //User had pick an image.
-//            Cursor cursor = getContentResolver().query(_uri, new String[] { android.provider.MediaStore.Images.ImageColumns.DATA }, null, null, null);
-//            cursor.moveToFirst();
-//
-//            //Link to the image
-//            final String imageFilePath = cursor.getString(0);
-//            cursor.close();
+        if (resultCode == RESULT_OK && requestCode == 0&& data != null ){
 
             String[] urls = data.getStringArrayExtra("urls");
             for (String url : urls){
                 mImageUrls.add(mImageUrls.size()-1, url);
 
             }
-
             mAdapter.notifyDataSetChanged();
         }
         super.onActivityResult(requestCode, resultCode, data);
