@@ -8,6 +8,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.*;
+import android.util.Log;
 import android.view.*;
 import android.view.animation.OvershootInterpolator;
 import android.widget.*;
@@ -182,27 +183,30 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
                 for (Tweet tweet: tweets){
                     tweetIds.add(tweet.getObjectId());
                 }
-                try {
-                AVUser user = AVUser.getCurrentUser();
-                AVRelation<AVObject> relation = user.getRelation("likes");
-                relation.getQuery().whereContainedIn("objectId", tweetIds).findInBackground(new FindCallback<AVObject>() {
-                    @Override
-                    public void done(List<AVObject> list, AVException e) {
-                        for (AVObject post : list){
-
-                            for (Tweet tweet : tweets){
-                                if (post.getObjectId().equals(tweet.getObjectId())){
-                                    tweet.setLike(true);
-                                }
-                            }
-                        }
-
-                        mTweetAdapter.getTweets().addAll(tweets);
-                        mTweetAdapter.updateItems();
-                    }
-                });}
-                catch (Exception ignored){}
-
+//                try {
+//                AVUser user = AVUser.getCurrentUser();
+//                AVRelation<AVObject> relation = user.getRelation("likes");
+//                relation.getQuery().whereContainedIn("objectId", tweetIds).findInBackground(new FindCallback<AVObject>() {
+//                    @Override
+//                    public void done(List<AVObject> list, AVException e) {
+//                        for (AVObject post : list){
+//
+//                            for (Tweet tweet : tweets){
+//                                if (post.getObjectId().equals(tweet.getObjectId())){
+//                                    tweet.setLike(true);
+//                                }
+//                            }
+//                        }
+//
+//                        mTweetAdapter.getTweets().addAll(tweets);
+//                        mTweetAdapter.updateItems();
+//                    }
+//                });}
+//                catch (Exception ignored){
+//                    Log.e("LOAD_DATA", ignored.getMessage());
+//                }
+                mTweetAdapter.getTweets().addAll(tweets);
+                mTweetAdapter.updateItems();
             }
         });
     }
@@ -325,7 +329,7 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
     public void onImageClick(List<String> imageUrls, int pos) {
         GalleryFragment fragment = GalleryFragment.newInstance(new ArrayList<String>(imageUrls), pos);
         fragment.setCancelable(true);
-        fragment.setStyle(DialogFragment.STYLE_NO_TITLE | DialogFragment.STYLE_NO_FRAME, android.R.style.Theme_NoTitleBar_Fullscreen );
+        fragment.setStyle(DialogFragment.STYLE_NO_FRAME, android.R.style.Theme_NoTitleBar_Fullscreen );
         fragment.show(getSupportFragmentManager(), "gallery");
     }
 

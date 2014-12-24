@@ -66,23 +66,46 @@ public class GalleryFragment extends DialogFragment {
         ImagePageAdapter adapter = new ImagePageAdapter(getChildFragmentManager());
         mViewPager.setAdapter(adapter);
         mViewPager.setCurrentItem(mPosition);
-
+//        mViewPager.setOnTouchListener(new View.OnTouchListener() {
+//            float oldX = 0, newX = 0, sens = 5;
+//
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                switch (event.getAction()) {
+//                    case MotionEvent.ACTION_DOWN:
+//                        oldX = event.getX();
+//                        break;
+//
+//                    case MotionEvent.ACTION_UP:
+//                        newX = event.getX();
+//                        if (Math.abs(oldX - newX) < sens) {
+//                            GalleryFragment.this.dismiss();
+//                            return true;
+//                        }
+//                        oldX = 0;
+//                        newX = 0;
+//                        break;
+//                }
+//
+//                return false;
+//            }
+//        });
 
 //      mViewPager.setOnClickListener(mOnClickListener);
-        final GestureDetector tapGestureDetector = new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onSingleTapConfirmed(MotionEvent e) {
-                GalleryFragment.this.dismiss();
-                return false;
-            }
-        });
-
-        mViewPager.setOnTouchListener(new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                tapGestureDetector.onTouchEvent(event);
-                return false;
-            }
-        });
+//        final GestureDetector tapGestureDetector = new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener() {
+//            @Override
+//            public boolean onSingleTapConfirmed(MotionEvent e) {
+//                GalleryFragment.this.dismiss();
+//                return false;
+//            }
+//        });
+//
+//        mViewPager.setOnTouchListener(new View.OnTouchListener() {
+//            public boolean onTouch(View v, MotionEvent event) {
+//                tapGestureDetector.onTouchEvent(event);
+//                return false;
+//            }
+//        });
 
 //
 
@@ -108,6 +131,7 @@ public class GalleryFragment extends DialogFragment {
     };
 
     class ImagePageAdapter extends FragmentPagerAdapter {
+
 
 
         public ImagePageAdapter(FragmentManager fm) {
