@@ -304,7 +304,7 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
             Tweet tweet = new Tweet();
             tweet.setContent(data.getStringExtra("content"));
             tweet.setImageUrl(data.getStringArrayListExtra("images"));
-            tweet.setPoster(AVUser.getCurrentUser());
+            tweet.setPoster(AVUser.getCurrentUser(Account.class));
             tweet.setPostTime(LocalDateTime.now().toString());
             tweet.saveInBackground(new SaveCallback() {
                 @Override
