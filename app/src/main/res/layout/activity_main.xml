@@ -45,6 +45,7 @@
             android:layout_height="32dp"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/toolbar_actionbar"
+            android:visibility="gone"
             android:layout_margin="50dp"
             />
     <include layout="@layout/toolbar_image_logo"/>

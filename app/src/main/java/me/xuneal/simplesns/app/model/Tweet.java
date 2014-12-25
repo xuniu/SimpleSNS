@@ -76,7 +76,7 @@ public class Tweet extends AVObject{
     }
 
     public Account getPoster() {
-        return getAVUser(POSTER, Account.class);
+        return AVUser.cast(getAVUser(POSTER), Account.class);
     }
 
     public void setPoster(Account poster) {

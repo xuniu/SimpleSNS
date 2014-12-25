@@ -41,19 +41,5 @@ public class Account extends AVUser {
         }
     }
 
-    public AVRelation<Tweet> getLikes() {
-        AVRelation<Tweet> relation = getRelation("likes");
-        return relation;
-    }
 
-    public void removeLikes(Tweet tweet) {
-        AVRelation<Tweet> likes = getLikes();
-        likes.remove(tweet);
-        this.saveInBackground();
-    }
-    public void addLiker(Tweet tweet) {
-        AVRelation<Tweet> likes = getLikes();
-        likes.add(tweet);
-        this.saveInBackground();
-    }
 }

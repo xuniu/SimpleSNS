@@ -103,7 +103,11 @@ public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         if (position > lastAnimatedPosition) {
             lastAnimatedPosition = position;
-            view.setTranslationY(Utils.getScreenHeight(context)/3);
+            if (mUserHeader && position==0) {
+                view.setTranslationY(Utils.getScreenHeight(context)/3*-1);
+            } else {
+                view.setTranslationY(Utils.getScreenHeight(context)/3);
+            }
             view.animate()
                     .translationY(0)
                     .setInterpolator(new DecelerateInterpolator(3.f))
@@ -114,26 +118,21 @@ public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder vh, int i) {
-        int pos;
+        runEnterAnimation(vh.itemView, i);
         if (mUserHeader){
-            pos = i-1;
             if (i!=0){
-                bindViewHolder((ViewHolder)vh, pos);
+                bindViewHolder((ViewHolder)vh, i-1);
             }
+        } else {
+            bindViewHolder((ViewHolder) vh, i);
+        }
 
-        }
-        else {
-            pos = i;
-            bindViewHolder((ViewHolder) vh, pos);
-        }
     }
 
     private void bindViewHolder(ViewHolder vh, int pos) {
         long now = LocalDateTime.now().toDateTime().getMillis();
         final Tweet tweet = tweets.get(pos);
         ViewHolder viewHolder = vh;
-        runEnterAnimation(viewHolder.itemView, pos);
-
         ImageLoader.getInstance().displayImage(tweet.getPoster().getAvatar(), viewHolder.ivAvatar);
         viewHolder.tvNickname.setText(tweet.getPoster().getNickName());
         viewHolder.tvContent.setText(tweet.getContent());

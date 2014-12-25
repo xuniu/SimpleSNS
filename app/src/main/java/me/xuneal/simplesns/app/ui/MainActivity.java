@@ -86,7 +86,7 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
             @Override
             public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
                 if (e2==null || e1==null) return false;
-                if (e2.getRawY()> e1.getRawY()){
+                if (e2.getRawY()> e1.getRawY() && mRecyclerView.getChildAt(0).getTop()>=0){
                     FrameLayout.LayoutParams layoutParams = new FrameLayout
                             .LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
                             mIvHeader.getHeight()-(int)(distanceY/2));
@@ -183,28 +183,28 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
                 for (Tweet tweet: tweets){
                     tweetIds.add(tweet.getObjectId());
                 }
-//                try {
-//                AVUser user = AVUser.getCurrentUser();
-//                AVRelation<AVObject> relation = user.getRelation("likes");
-//                relation.getQuery().whereContainedIn("objectId", tweetIds).findInBackground(new FindCallback<AVObject>() {
-//                    @Override
-//                    public void done(List<AVObject> list, AVException e) {
-//                        for (AVObject post : list){
-//
-//                            for (Tweet tweet : tweets){
-//                                if (post.getObjectId().equals(tweet.getObjectId())){
-//                                    tweet.setLike(true);
-//                                }
-//                            }
-//                        }
-//
-//                        mTweetAdapter.getTweets().addAll(tweets);
-//                        mTweetAdapter.updateItems();
-//                    }
-//                });}
-//                catch (Exception ignored){
-//                    Log.e("LOAD_DATA", ignored.getMessage());
-//                }
+                try {
+                AVUser account = AVUser.getCurrentUser();
+                AVRelation<Tweet> relation = account.getRelation("likes");
+                relation.getQuery().whereContainedIn("objectId", tweetIds).findInBackground(new FindCallback<Tweet>() {
+                    @Override
+                    public void done(List<Tweet> list, AVException e) {
+                        for (Tweet post : list){
+
+                            for (Tweet tweet : tweets){
+                                if (post.getObjectId().equals(tweet.getObjectId())){
+                                    tweet.setLike(true);
+                                }
+                            }
+                        }
+
+                        mTweetAdapter.getTweets().addAll(tweets);
+                        mTweetAdapter.updateItems();
+                    }
+                });}
+                catch (Exception ignored){
+                    Log.e("LOAD_DATA", ignored.getMessage());
+                }
                 mTweetAdapter.getTweets().addAll(tweets);
                 mTweetAdapter.updateItems();
             }
@@ -273,6 +273,7 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
                 .setStartDelay(300)
                 .setDuration(ANIM_DURATION_FAB)
                 .start();
+        mRainbowProgressBar.setVisibility(View.VISIBLE);
 
         mTweetAdapter.updateItems();
     }
@@ -303,7 +304,7 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
             Tweet tweet = new Tweet();
             tweet.setContent(data.getStringExtra("content"));
             tweet.setImageUrl(data.getStringArrayListExtra("images"));
-            tweet.setPoster(AVUser.getCurrentUser(Account.class));
+            tweet.setPoster(AVUser.getCurrentUser());
             tweet.setPostTime(LocalDateTime.now().toString());
             tweet.saveInBackground(new SaveCallback() {
                 @Override

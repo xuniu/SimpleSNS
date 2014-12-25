@@ -99,7 +99,7 @@ public class ProfileActivity extends BaseActivity implements ObservableScrollVie
         setTitle(null);
 
 
-        mAccount = AVUser.getCurrentUser(Account.class);
+        mAccount = AVUser.cast(AVUser.getCurrentUser(),Account.class);
         if (mAccount == null) {
             startActivity(new Intent(this, LoginActivity.class));
         } else {
