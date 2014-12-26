@@ -20,7 +20,9 @@ public class Tweet extends AVObject{
     public static final String LIKES = "likes";
     public static final String COMMENTS = "comments";
     public static final String IMAGES = "images";
+    public static final String TWEET_ID="tweetId";
     public static final String TABLE_NAME = "Tweets";
+
 
     private boolean like;
 
@@ -108,8 +110,14 @@ public class Tweet extends AVObject{
         AVQuery<AVObject> query = AVQuery.getQuery("Comments");
         query.whereEqualTo("tweet", this);
         query.findInBackground(callback);
+    }
 
+    public int getTweetId(){
+        return getInt(TWEET_ID);
+    }
 
+    public void setTweetId(int tweetId) {
+        put(TWEET_ID, tweetId);
     }
 //    public void addComment(Comment comment) {
 //        AVRelation relation = getRelation(COMMENTS);

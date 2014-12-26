@@ -3,9 +3,12 @@ package me.xuneal.simplesns.app.ui;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.DialogFragment;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.*;
 import android.util.Log;
@@ -18,13 +21,18 @@ import com.melnykov.fab.FloatingActionButton;
 import com.special.ResideMenu.ResideMenu;
 import com.special.ResideMenu.ResideMenuItem;
 import in.srain.cube.views.ptr.PtrFrameLayout;
+import me.xuneal.simplesns.app.MyApplication;
 import me.xuneal.simplesns.app.R;
 import me.xuneal.simplesns.app.model.Account;
 import me.xuneal.simplesns.app.model.Tweet;
 import me.xuneal.simplesns.app.ui.components.RainbowProgressbar;
 import me.xuneal.simplesns.app.ui.components.ResizeAnimation;
+import me.xuneal.simplesns.app.util.AccountUtils;
 import me.xuneal.simplesns.app.util.Utils;
 import org.joda.time.LocalDateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.DateTimeParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +58,9 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
     private ImageView mIvHeader;
     private GestureDetector mGestureDetector;
 
+    private int mLastTweetId = -1;
+    private Handler mHandler = new Handler();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,14 +73,15 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mTweetAdapter = new TweetAdapter(this, new ArrayList<Tweet>());
         mRainbowProgressBar = (RainbowProgressbar) findViewById(R.id.rpb);
-        FrameLayout frameLayout = (FrameLayout) LayoutInflater.from(this).inflate(R.layout.item_header, null);
-        mIvHeader = (ImageView) frameLayout.findViewById(R.id.iv_header);
-        mTweetAdapter.setHeader(frameLayout);
+        RelativeLayout relativeLayout = (RelativeLayout) LayoutInflater.from(this).inflate(R.layout.item_header, null);
+        mIvHeader = (ImageView) relativeLayout.findViewById(R.id.iv_header);
+        mTweetAdapter.setHeader(relativeLayout);
         mRecyclerView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == android.view.MotionEvent.ACTION_UP) {
-                    ResizeAnimation animation = new ResizeAnimation(mIvHeader, Utils.dpToPx(300));
+                    ResizeAnimation animation = new ResizeAnimation(mIvHeader, getResources()
+                            .getDimensionPixelSize(R.dimen.flexible_space_image_height));
                     animation.setDuration(200);
                     mIvHeader.startAnimation(animation);
                     mRainbowProgressBar.touchRelease();
@@ -87,8 +99,8 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
             public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
                 if (e2==null || e1==null) return false;
                 if (e2.getRawY()> e1.getRawY() && mRecyclerView.getChildAt(0).getTop()>=0){
-                    FrameLayout.LayoutParams layoutParams = new FrameLayout
-                            .LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                    RelativeLayout.LayoutParams layoutParams = new RelativeLayout
+                            .LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
                             mIvHeader.getHeight()-(int)(distanceY/2));
                     mIvHeader.setLayoutParams(layoutParams);
                     mRainbowProgressBar.setScrollDistance((int)distanceY);
@@ -111,17 +123,17 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
 
         mLogo = (ImageView) findViewById(R.id.logo);
 
-        mRainbowProgressBar.setOnRefreshListener(new RainbowProgressbar.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                mRainbowProgressBar.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mRainbowProgressBar.setRefresh(false);
-                    }
-                }, 4000);
-            }
-        });
+//        mRainbowProgressBar.setOnRefreshListener(new RainbowProgressbar.OnRefreshListener() {
+//            @Override
+//            public void onRefresh() {
+//                mRainbowProgressBar.postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        mRainbowProgressBar.setRefresh(false);
+//                    }
+//                }, 4000);
+//            }
+//        });
 
 
         getActionBarToolbar().setNavigationIcon(R.drawable.ic_menu_white);
@@ -162,16 +174,28 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
             }
         });
 
-        loadData();
+        mRainbowProgressBar.setRefresh(true);
+        mRainbowProgressBar.setOnRefreshListener(new RainbowProgressbar.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                loadData();
+            }
+        });
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loadData();
+            }
+        }, 1000);
     }
 
     private void loadData(){
-
-
         AVQuery<Tweet> query = AVObject.getQuery(Tweet.class);
         query.include("images");
         query.orderByDescending("updatedAt");
         query.include(Tweet.POSTER);
+        query.whereGreaterThan("tweetId", mLastTweetId);
+        query.setLimit(20);
         query.findInBackground(new FindCallback<Tweet>() {
             @Override
             public void done(final List<Tweet> tweets, AVException e) {
@@ -179,12 +203,16 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
                 mRainbowProgressBar.setRefresh(false);
                 if (tweets==null) return;
 
-                List<String> tweetIds = new ArrayList<String>(tweets.size());
+                if (tweets.size()>20) {
+                    mTweetAdapter.getTweets().clear();
+                }
+
+                final List<String> tweetIds = new ArrayList<String>(tweets.size());
                 for (Tweet tweet: tweets){
                     tweetIds.add(tweet.getObjectId());
                 }
                 try {
-                AVUser account = AVUser.getCurrentUser();
+                Account account = AccountUtils.getDefaultAccount();
                 AVRelation<Tweet> relation = account.getRelation("likes");
                 relation.getQuery().whereContainedIn("objectId", tweetIds).findInBackground(new FindCallback<Tweet>() {
                     @Override
@@ -200,13 +228,13 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
 
                         mTweetAdapter.getTweets().addAll(tweets);
                         mTweetAdapter.updateItems();
+                        mLastTweetId = mTweetAdapter.getTweets().get(0).getTweetId();
                     }
                 });}
                 catch (Exception ignored){
                     Log.e("LOAD_DATA", ignored.getMessage());
                 }
-                mTweetAdapter.getTweets().addAll(tweets);
-                mTweetAdapter.updateItems();
+
             }
         });
     }
@@ -301,11 +329,25 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode==0 && resultCode== RESULT_OK) {
+
             Tweet tweet = new Tweet();
             tweet.setContent(data.getStringExtra("content"));
             tweet.setImageUrl(data.getStringArrayListExtra("images"));
             tweet.setPoster(AVUser.getCurrentUser(Account.class));
             tweet.setPostTime(LocalDateTime.now().toString());
+
+            Notification notification = new Notification.Builder(this)
+                    .setSmallIcon(R.drawable.ic_launcher)
+                    .setContentTitle("Posting")
+                    .setContentText(tweet.getContent())
+                    .setAutoCancel(false)
+                    .setOngoing(true)
+                    .setProgress(0,0,true)
+                    .build();
+
+            final NotificationManager notificationManager = ((NotificationManager)getSystemService(NOTIFICATION_SERVICE));
+            notificationManager.notify(0, notification);
+
             tweet.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(AVException e) {
@@ -313,7 +355,18 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
                         Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                     else {
-                        Toast.makeText(getApplicationContext(), "Save ok", Toast.LENGTH_SHORT).show();
+                        Notification notification = new Notification.Builder(MainActivity.this)
+                                .setContentTitle("Post Success")
+                                .setAutoCancel(true)
+                                .setSmallIcon(R.drawable.ic_launcher)
+                                .build();
+                        notificationManager.notify(0, notification);
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                notificationManager.cancel(0);
+                            }
+                        }, 3000);
 
                     }
                 }
@@ -330,8 +383,10 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
     public void onImageClick(List<String> imageUrls, int pos) {
         GalleryFragment fragment = GalleryFragment.newInstance(new ArrayList<String>(imageUrls), pos);
         fragment.setCancelable(true);
-        fragment.setStyle(DialogFragment.STYLE_NO_FRAME, android.R.style.Theme_NoTitleBar_Fullscreen );
+        fragment.setStyle(DialogFragment.STYLE_NO_FRAME, android.R.style.Theme_Black_NoTitleBar );
         fragment.show(getSupportFragmentManager(), "gallery");
+        overridePendingTransition(0,0);
+
     }
 
     @Override

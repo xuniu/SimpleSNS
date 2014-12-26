@@ -27,6 +27,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import me.xuneal.simplesns.app.R;
 import me.xuneal.simplesns.app.model.Account;
 import me.xuneal.simplesns.app.model.Tweet;
+import me.xuneal.simplesns.app.util.AccountUtils;
 
 import java.util.List;
 
@@ -99,7 +100,7 @@ public class ProfileActivity extends BaseActivity implements ObservableScrollVie
         setTitle(null);
 
 
-        mAccount = AVUser.cast(AVUser.getCurrentUser(),Account.class);
+        mAccount = AccountUtils.getDefaultAccount();
         if (mAccount == null) {
             startActivity(new Intent(this, LoginActivity.class));
         } else {

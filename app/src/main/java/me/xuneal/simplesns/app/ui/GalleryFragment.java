@@ -6,8 +6,10 @@ import android.support.v4.app.*;
 import android.support.v4.view.ViewPager;
 import android.view.*;
 
+import android.view.animation.Animation;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import me.xuneal.simplesns.app.R;
+import me.xuneal.simplesns.app.util.Utils;
 import uk.co.senab.photoview.PhotoView;
 
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ public class GalleryFragment extends DialogFragment {
 
     private ArrayList<String> mImageUrls;
     private int mPosition;
+    private View mRootView;
 
 
     /**
@@ -61,56 +64,77 @@ public class GalleryFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_gallery_container, null, false);
-        mViewPager = (ViewPager) view.findViewById(R.id.view_pager);
+        mRootView = inflater.inflate(R.layout.fragment_gallery_container, null, false);
+        mRootView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                mRootView.getViewTreeObserver().removeOnPreDrawListener(this);
+                mRootView.setScaleX(0.1f);
+                mRootView.setScaleY(0.1f);
+                mRootView.setAlpha(0);
+
+                mRootView.setPivotX(Utils.getScreenWidth(getActivity()) / 2);
+                mRootView.setPivotY(Utils.getScreenHeight(getActivity()) / 2);
+
+
+                mRootView.animate().scaleX(1).scaleY(1).alpha(1).setDuration(300).start();
+
+                return true;
+            }
+        });
+
+
+
+        mViewPager = (ViewPager) mRootView.findViewById(R.id.view_pager);
         ImagePageAdapter adapter = new ImagePageAdapter(getChildFragmentManager());
         mViewPager.setAdapter(adapter);
         mViewPager.setCurrentItem(mPosition);
-//        mViewPager.setOnTouchListener(new View.OnTouchListener() {
-//            float oldX = 0, newX = 0, sens = 5;
-//
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                switch (event.getAction()) {
-//                    case MotionEvent.ACTION_DOWN:
-//                        oldX = event.getX();
-//                        break;
-//
-//                    case MotionEvent.ACTION_UP:
-//                        newX = event.getX();
-//                        if (Math.abs(oldX - newX) < sens) {
-//                            GalleryFragment.this.dismiss();
-//                            return true;
-//                        }
-//                        oldX = 0;
-//                        newX = 0;
-//                        break;
-//                }
-//
-//                return false;
-//            }
-//        });
 
-//      mViewPager.setOnClickListener(mOnClickListener);
-//        final GestureDetector tapGestureDetector = new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener() {
-//            @Override
-//            public boolean onSingleTapConfirmed(MotionEvent e) {
-//                GalleryFragment.this.dismiss();
-//                return false;
-//            }
-//        });
-//
-//        mViewPager.setOnTouchListener(new View.OnTouchListener() {
-//            public boolean onTouch(View v, MotionEvent event) {
-//                tapGestureDetector.onTouchEvent(event);
-//                return false;
-//            }
-//        });
-
-//
-
-        return view;
+        return mRootView;
     }
+
+    private View mOnDismissAnimationView = null;
+    private Animation mOnDismissAnimation = null;
+    private boolean mIsAnimationRunning = false;
+    private boolean mIsDialogDismissed = false;
+
+    @Override
+    public void onStart() {
+        mIsDialogDismissed = false;
+        mIsAnimationRunning = false;
+        super.onStart();
+    }
+
+    @Override
+    public void dismiss() {
+        if (!mIsDialogDismissed) {
+            mIsDialogDismissed = true;
+            doDismiss();
+        }
+    }
+
+    private void doDismiss() {
+        if (mIsAnimationRunning == false
+                ) {
+            mIsAnimationRunning = true;
+
+            mRootView.animate().alpha(0).scaleX(0.1f).scaleY(0.1f).setDuration(300).withEndAction(new Runnable() {
+                @Override
+                public void run() {
+                    parentDismiss();
+                    mIsAnimationRunning=false;
+                }
+            }).start();
+        } else {
+            super.dismiss();
+        }
+    }
+
+    private void parentDismiss() {
+        super.dismiss();
+    }
+
+
 
     class TapGestureListener extends GestureDetector.SimpleOnGestureListener{
 

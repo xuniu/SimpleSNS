@@ -38,7 +38,7 @@
         android:layout_below="@id/tv_nickname"
         android:layout_marginLeft="72dp"
         android:alpha=".54"
-        android:textSize="14sp"
+        android:textSize="12sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
             />
