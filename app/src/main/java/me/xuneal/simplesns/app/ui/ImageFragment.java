@@ -18,8 +18,6 @@ import uk.co.senab.photoview.PhotoViewAttacher;
  */
 public class ImageFragment extends Fragment {
 
-
-
     public static ImageFragment newInstance(String imageUrl){
         ImageFragment fragment = new ImageFragment();
         Bundle args = new Bundle();

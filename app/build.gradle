@@ -74,7 +74,7 @@ dependencies {
     compile 'in.srain.cube:ultra-ptr:1.0.5@aar'
     compile 'com.flaviofaria:kenburnsview:1.0.5'
     compile 'com.github.chrisbanes.photoview:library:1.2.3'
-
+    compile 'com.rengwuxian.materialedittext:library:1.7.1'
     compile project('libs:ResideMenu')
 
 }

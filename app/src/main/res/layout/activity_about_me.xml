@@ -38,7 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:autoLink="email"
-            android:text="I'm a Senior Android Developer who is looking for a remote work,If you like me, Pls send me a mail to imxuneal@gmail.com"
+            android:text="@string/about_me_content"
             />
 
 </RelativeLayout>

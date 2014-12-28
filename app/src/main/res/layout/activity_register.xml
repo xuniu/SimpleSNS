@@ -2,7 +2,7 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-
+                xmlns:app="http://schemas.android.com/apk/res-auto"
                 tools:context="me.xuneal.simplesns.app.ui.RegisterActivity">
 
     <include layout="@layout/toolbar_actionbar"/>
@@ -29,6 +29,8 @@
             android:id="@+id/email_login_form"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
             android:orientation="vertical">
 
             <de.hdodenhof.circleimageview.CircleImageView
@@ -41,15 +43,16 @@
                 android:layout_gravity="center"
                 />
 
-            <EditText
+            <com.rengwuxian.materialedittext.MaterialEditText
                 android:id="@+id/et_username"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/prompt_username"
+                app:floatingLabel="normal"
                 android:maxLines="1"
                 android:singleLine="true"/>
 
-            <EditText
+            <com.rengwuxian.materialedittext.MaterialEditText
                 android:id="@+id/et_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -58,13 +61,16 @@
                 android:imeActionLabel="@string/action_sign_in_short"
                 android:imeOptions="actionUnspecified"
                 android:inputType="textPassword"
+                app:floatingLabel="normal"
                 android:maxLines="1"
                 android:singleLine="true"/>
-            <EditText
+            <com.rengwuxian.materialedittext.MaterialEditText
                 android:id="@+id/et_nickname"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Nick Name"
+                android:hint="@string/prompt_nick_name"
+                app:floatingLabel="normal"
+
                 android:maxLines="1"
                 android:singleLine="true"/>
 
@@ -73,8 +79,8 @@
                 style="?android:textAppearanceSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:text="Sign Up"
+                android:text="@string/register"
+                android:textColor="@color/white"
                 android:background="@drawable/btn_send_comment"
                 android:textStyle="bold"/>
 

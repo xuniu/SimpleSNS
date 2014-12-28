@@ -14,10 +14,7 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.avos.avoscloud.AVException;
-import com.avos.avoscloud.AVQuery;
-import com.avos.avoscloud.AVUser;
-import com.avos.avoscloud.FindCallback;
+import com.avos.avoscloud.*;
 import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
@@ -99,23 +96,15 @@ public class ProfileActivity extends BaseActivity implements ObservableScrollVie
         mTitleView.setText(getTitle());
         setTitle(null);
 
+        Account account = AccountUtils.getDefaultAccount();
+        AVRelation<Tweet> relation = account.getRelation("likes");
 
-        mAccount = AccountUtils.getDefaultAccount();
-        if (mAccount == null) {
-            startActivity(new Intent(this, LoginActivity.class));
-        } else {
-
-            ImageLoader.getInstance().displayImage(mAccount.getAvatar(), mAvatar);
-            ImageLoader.getInstance().displayImage("assets://bg_default_cover.png", mCover);
-            mNickname.setText(mAccount.getNickName());
-        }
-
-
-        AVQuery<Tweet> query = new AVQuery<Tweet>(Tweet.TABLE_NAME);
-        query.include("images");
-        query.include(Tweet.POSTER);
-        query.orderByDescending("updatedAt");
-        query.whereEqualTo(Tweet.POSTER, AVUser.getCurrentUser());
+        AVQuery<Tweet> query = relation.getQuery().include("images").include(Tweet.POSTER).orderByDescending("updatedAt");
+//        AVQuery<Tweet> query = new AVQuery<Tweet>(Tweet.TABLE_NAME);
+//        query.include("images");
+//        query.include(Tweet.POSTER);
+//        query.orderByDescending("updatedAt");
+//        query.whereEqualTo(Tweet.POSTER, AVUser.getCurrentUser());
         query.findInBackground(new FindCallback<Tweet>() {
             @Override
             public void done(List<Tweet> list, AVException e) {
@@ -126,6 +115,8 @@ public class ProfileActivity extends BaseActivity implements ObservableScrollVie
             }
         });
 
+        mTitleView.setPivotX(0);
+        mTitleView.setPivotY(0);
 
         mAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,8 +135,22 @@ public class ProfileActivity extends BaseActivity implements ObservableScrollVie
                 // but the height of the content view is 0 on 'onCreate'.
                 // So we should get it with post().
                 mListBackgroundView.getLayoutParams().height = contentView.getHeight();
+
+                mAccount = AccountUtils.getDefaultAccount();
+                if (mAccount == null) {
+                    startActivity(new Intent(ProfileActivity.this, LoginActivity.class));
+                } else {
+
+                    ImageLoader.getInstance().displayImage(mAccount.getAvatar(), mAvatar);
+                    ImageLoader.getInstance().displayImage("assets://bg_default_cover.png", mCover);
+                    mNickname.setText(mAccount.getNickName());
+                    onScrollChanged(0, false, false);
+
+                }
+
             }
         });
+
     }
 
 
@@ -163,7 +168,7 @@ public class ProfileActivity extends BaseActivity implements ObservableScrollVie
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_login_out) {
-            AVUser.logOut();
+            AccountUtils.logout();
             startActivity(new Intent(this, LoginActivity.class));
         }
         return super.onOptionsItemSelected(item);
@@ -211,16 +216,25 @@ public class ProfileActivity extends BaseActivity implements ObservableScrollVie
 
         // Scale title text
         float scale = 1 + Math.max(0, Math.min(MAX_TEXT_SCALE_DELTA, (flexibleRange - scrollY) / flexibleRange));
-        ViewHelper.setPivotX(mTitleView, 0);
-        ViewHelper.setPivotY(mTitleView, 0);
-        ViewHelper.setScaleX(mTitleView, scale);
-        ViewHelper.setScaleY(mTitleView, scale);
+//        ViewHelper.setPivotX(mTitleView, 0);
+//        ViewHelper.setPivotY(mTitleView, 0);
+//        ViewHelper.setScaleX(mTitleView, scale);
+//        ViewHelper.setScaleY(mTitleView, scale);
+
+        mTitleView.setScaleX( scale);
+        mTitleView.setScaleY( scale);
 
         // Translate title text
         int maxTitleTranslationY = (int) (mFlexibleSpaceImageHeight - mTitleView.getHeight() * scale);
         int titleTranslationY = maxTitleTranslationY - scrollY;
             titleTranslationY = Math.max(0, titleTranslationY);
         ViewHelper.setTranslationY(mTitleView, titleTranslationY);
+
+        if (-scrollY + mFlexibleSpaceImageHeight <= mActionBarSize) {
+            setBackgroundAlpha(getActionBarToolbar(), 1, getResources().getColor(R.color.color_primary));
+        } else {
+            setBackgroundAlpha(getActionBarToolbar(), 0, getResources().getColor(R.color.color_primary));
+        }
 
     }
 

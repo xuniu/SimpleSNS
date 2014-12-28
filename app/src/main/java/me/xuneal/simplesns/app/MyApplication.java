@@ -2,6 +2,7 @@ package me.xuneal.simplesns.app;
 
 import android.app.Application;
 import android.graphics.Bitmap;
+import android.os.Handler;
 import com.avos.avoscloud.AVOSCloud;
 import com.avos.avoscloud.AVAnalytics;
 import com.avos.avoscloud.AVObject;
@@ -11,6 +12,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
+import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import me.xuneal.simplesns.app.model.Account;
 import me.xuneal.simplesns.app.model.Comment;
 import me.xuneal.simplesns.app.model.Tweet;
@@ -20,9 +22,19 @@ import me.xuneal.simplesns.app.model.Tweet;
  */
 public class MyApplication extends Application {
 
+
+    private Handler mHandler = new Handler();
+    private static MyApplication mInstance;
+
+    public static MyApplication getInstance() {
+        return mInstance;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
+
+        mInstance = this;
         //如果使用美国节点，请加上这行代码 AVOSCloud.useAVCloudUS();
         AVObject.registerSubclass(Tweet.class);
         AVObject.registerSubclass(Comment.class);
@@ -34,7 +46,8 @@ public class MyApplication extends Application {
                 .cacheOnDisk(true)
                 .imageScaleType(ImageScaleType.EXACTLY)
                 .bitmapConfig(Bitmap.Config.RGB_565)
-                .considerExifParams(true)
+                        .displayer(new FadeInBitmapDisplayer(200))
+//                .considerExifParams(true)
                 .build();
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
                 .threadPriority(Thread.NORM_PRIORITY - 2)
@@ -47,6 +60,11 @@ public class MyApplication extends Application {
                 .build();
         // Initialize ImageLoader with configuration.
         ImageLoader.getInstance().init(config);
+
+    }
+
+    public Handler getUIHandler() {
+        return mHandler;
     }
 
 

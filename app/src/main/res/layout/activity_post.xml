@@ -9,7 +9,7 @@
 
     <EditText
         android:id="@+id/text"
-        android:hint="Share some thing"
+        android:hint="@string/post_content_hint"
         android:layout_below="@+id/toolbar_actionbar"
         android:gravity="start"
         android:background="@android:color/transparent"

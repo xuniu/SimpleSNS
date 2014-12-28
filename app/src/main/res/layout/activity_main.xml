@@ -19,7 +19,7 @@
     <com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView
             android:id="@+id/my_recycler_view"
             android:layout_below="@+id/toolbar_actionbar"
-            android:scrollbars="vertical"
+            android:scrollbars="none"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/color_bg"

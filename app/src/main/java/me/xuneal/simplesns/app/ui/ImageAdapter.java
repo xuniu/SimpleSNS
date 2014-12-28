@@ -46,6 +46,8 @@ class ImageAdapter extends BaseAdapter {
             AbsListView.LayoutParams layoutParams = new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, AbsListView.LayoutParams.MATCH_PARENT);
             convertView.setLayoutParams(layoutParams);
                     ((SquareImageView) convertView).setScaleType(ImageView.ScaleType.CENTER_CROP);
+            ((SquareImageView) convertView).setMaxHeight(150);
+            ((SquareImageView) convertView).setMaxWidth(150);
             viewHolder = new ViewHolder();
             viewHolder.mImageView = (SquareImageView) convertView;
             viewHolder.mImageView.setClickable(false);

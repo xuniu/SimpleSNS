@@ -7,6 +7,7 @@ import android.support.v4.view.ViewPager;
 import android.view.*;
 
 import android.view.animation.Animation;
+import android.widget.TextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import me.xuneal.simplesns.app.R;
 import me.xuneal.simplesns.app.util.Utils;
@@ -25,7 +26,7 @@ public class GalleryFragment extends DialogFragment {
     private static final String POSITION = "position";
 
     private ViewPager mViewPager;
-
+    private TextView mTvIndicator;
     private ArrayList<String> mImageUrls;
     private int mPosition;
     private View mRootView;
@@ -65,6 +66,7 @@ public class GalleryFragment extends DialogFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         mRootView = inflater.inflate(R.layout.fragment_gallery_container, null, false);
+        mTvIndicator = (TextView) mRootView.findViewById(R.id.tv_indicator);
         mRootView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {
@@ -89,6 +91,22 @@ public class GalleryFragment extends DialogFragment {
         ImagePageAdapter adapter = new ImagePageAdapter(getChildFragmentManager());
         mViewPager.setAdapter(adapter);
         mViewPager.setCurrentItem(mPosition);
+        mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i1) {
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+                mTvIndicator.setText(String.format("%d/%d",i,  mImageUrls.size()));
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
 
         return mRootView;
     }
@@ -155,8 +173,6 @@ public class GalleryFragment extends DialogFragment {
     };
 
     class ImagePageAdapter extends FragmentPagerAdapter {
-
-
 
         public ImagePageAdapter(FragmentManager fm) {
             super(fm);

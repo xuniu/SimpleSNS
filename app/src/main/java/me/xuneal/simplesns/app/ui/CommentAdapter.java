@@ -96,6 +96,7 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         private CircleImageView mIvAvatar;
         private TextView mTvContent;
         private TextView mTvNickName;
+        private TextView mTvPostTime;
 
         /**
          * Find the Views in the layout<br />
@@ -107,6 +108,7 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             ImageLoader.getInstance().displayImage(comment.getPoster().getAvatar(), mIvAvatar);
             mTvContent.setText(comment.getContent());
             mTvNickName.setText(comment.getPoster().getNickName());
+            mTvPostTime.setText(comment.getPostTime());
         }
 
 
@@ -115,6 +117,7 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             mIvAvatar = (CircleImageView)itemView.findViewById(R.id.iv_avatar);
             mTvNickName = (TextView)itemView.findViewById(R.id.tv_nickname);
             mTvContent = (TextView)itemView.findViewById(R.id.tv_content);
+            mTvPostTime = (TextView)itemView.findViewById(R.id.tv_post_time);
         }
     }
 }

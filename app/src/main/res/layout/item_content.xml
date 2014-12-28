@@ -19,18 +19,29 @@
         android:textSize="16sp"
         android:layout_marginLeft="72dp"
         android:layout_marginRight="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         />
+    <TextView
+            android:id="@+id/tv_post_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:alpha=".54"
+            android:layout_marginLeft="72dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_below="@+id/tv_nickname"
+            />
     <TextView
         android:id="@+id/tv_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="72dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"
         android:textSize="14sp"
-        android:layout_below="@id/tv_nickname"
+        android:layout_below="@id/tv_post_time"
         />
     <View
         android:layout_width="match_parent"

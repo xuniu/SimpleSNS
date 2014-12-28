@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="me.xuneal.demo.leanclouddemo.app.ui.PostActivity" >
     <item android:id="@+id/action_post"
-        android:title="Send"
+        android:title="@string/send"
         android:orderInCategory="100"
         app:showAsAction="always" />
 </menu>

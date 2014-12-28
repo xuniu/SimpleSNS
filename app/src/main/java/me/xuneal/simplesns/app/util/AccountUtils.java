@@ -34,4 +34,10 @@ public class AccountUtils {
         }
         return mAccount;
     }
+
+    public static void logout(){
+        mAccount=null;
+        AVUser.logOut();
+    }
+
 }

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Simple SNS</string>
+    <string name="about_me">关于我</string>
+    <string name="action_settings">设置</string>
+    <string name="register">注册</string>
+    <string name="title_activity_post">发微博</string>
+    <string name="action_post">发送</string>
+    <string name="title_posting">正在保存</string>
+    <string name="title_activity_profile">收藏夹</string>
+    <string name="action_profile">收藏夹</string>
+    <string name="title_activity_comments">评论</string>
+    <string name="title_activity_pick_photos">图片</string>
+    <string name="title_activity_register">注册</string>
+    <string name="title_activity_about_me">关于我</string>
+
+    <string name="title_setting">设置</string>
+    <string name="title_favorite">收藏夹</string>
+    <string name="title_about_me">关于我</string>
+    <string name="send">发送</string>
+    <string name="post_content_hint">说些什么吧</string>
+    <string name="ok">确定</string>
+    <string name="about_me_content">嗨，各位\n\n我是一个资深的Android开发人员，我正在找一份远程的全职开发工作，如果你觉得这个Demo还可以，联系我呗 imxuneal@gmail.com
+    </string>
+    <string name="prompt_nick_name">昵称</string>
+
+</resources>

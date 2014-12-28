@@ -2,11 +2,14 @@ package me.xuneal.simplesns.app.ui;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateInterpolator;
@@ -15,6 +18,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import com.avos.avoscloud.*;
 import me.xuneal.simplesns.app.R;
 import me.xuneal.simplesns.app.model.Account;
@@ -82,6 +86,23 @@ public class CommentsActivity extends BaseActivity implements View.OnClickListen
 
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        MenuItem profileMenuItem = menu.findItem(R.id.action_profile);
+        profileMenuItem.setActionView(R.layout.menu_item_view);
+//        profileMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+//            @Override
+//            public boolean onMenuItemClick(MenuItem item) {
+//                Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+//                startActivity(intent);
+//                overridePendingTransition(0,0);
+//                return true;
+//            }
+//        });
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comments);
@@ -93,7 +114,6 @@ public class CommentsActivity extends BaseActivity implements View.OnClickListen
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         drawingStartLocation = getIntent().getIntExtra(ARG_DRAWING_START_LOCATION, 0);
-        AVQuery<Tweet> query = new AVQuery<Tweet>(Tweet.TABLE_NAME);
         mRootPanel.setVisibility(View.VISIBLE);
         mRootPanel.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
@@ -103,19 +123,19 @@ public class CommentsActivity extends BaseActivity implements View.OnClickListen
                 return true;
             }
         });
-        query.include("comments").getInBackground(getIntent().getStringExtra(ARG_POST_ID), new GetCallback<Tweet>() {
+        AVQuery<Tweet> tweetQuery = new AVQuery<>(Tweet.TABLE_NAME);
+        tweetQuery.getInBackground(getIntent().getStringExtra(ARG_POST_ID), new GetCallback<Tweet>() {
             @Override
             public void done(Tweet tweet, AVException e) {
-                mTweet = tweet;
-                mTweet.getComments(new FindCallback<AVObject>() {
+                AVQuery<Comment> query = new AVQuery<Comment>(Comment.TABLE_NAME);
+                query.whereEqualTo("tweet", tweet);
+                query.include("poster").findInBackground(new FindCallback<Comment>() {
                     @Override
-                    public void done(List<AVObject> list, AVException e) {
-                        if (list !=null) {
-                            for (AVObject comment : list) {
-                                mComments.add((Comment) comment);
-                            }
+                    public void done(List<Comment> list, AVException e) {
+                        for (Comment comment : list){
+                            mComments.add(comment);
                         }
-
+                        mCommentAdapter.updateItems();
                     }
                 });
             }

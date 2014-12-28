@@ -60,7 +60,7 @@ public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         mUserHeader = useHeader;
     }
 
-    public void setHeader(View view){
+    public void setHeader(View view) {
         mHeader = view;
         mUserHeader = true;
 
@@ -69,31 +69,29 @@ public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public View getHeader() {
         return mHeader;
     }
+
     @Override
     public int getItemViewType(int position) {
-        if (position==0 && mUserHeader){
+        if (position == 0 && mUserHeader) {
             return 2;
         } else
             return 1;
     }
 
 
-
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View view;
-        if (i==2){
+        if (i == 2) {
             view = mHeader;
             return new VHeader(view);
-        }
-        else {
+        } else {
             view = LayoutInflater.from(viewGroup.getContext())
                     .inflate(R.layout.item_tweet, viewGroup, false);
             ViewHolder viewHolder = new ViewHolder(view);
             return viewHolder;
         }
     }
-
 
 
     private void runEnterAnimation(View view, int position) {
@@ -103,10 +101,10 @@ public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         if (position > lastAnimatedPosition) {
             lastAnimatedPosition = position;
-            if (mUserHeader && position==0) {
-                view.setTranslationY(Utils.getScreenHeight(context)/3*-1);
+            if (mUserHeader && position == 0) {
+                view.setTranslationY(Utils.getScreenHeight(context) / 3 * -1);
             } else {
-                view.setTranslationY(Utils.getScreenHeight(context)/3);
+                view.setTranslationY(Utils.getScreenHeight(context) / 3);
             }
             view.animate()
                     .translationY(0)
@@ -119,9 +117,9 @@ public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder vh, int i) {
         runEnterAnimation(vh.itemView, i);
-        if (mUserHeader){
-            if (i!=0){
-                bindViewHolder((ViewHolder)vh, i-1);
+        if (mUserHeader) {
+            if (i != 0) {
+                bindViewHolder((ViewHolder) vh, i - 1);
             }
         } else {
             bindViewHolder((ViewHolder) vh, i);
@@ -160,21 +158,21 @@ public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         viewHolder.cbLike.setChecked(tweet.isLike());
         viewHolder.ibComment.setOnClickListener(this);
         viewHolder.ibComment.setTag(pos);
-        adjustGridViewColumnNum(viewHolder.ivPhoto, tweets.size());
+        adjustGridViewColumnNum(viewHolder.ivPhoto, tweet.getImageUrl().size());
         viewHolder.ivPhoto.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (mOnFeedItemClickListener!=null){
+                if (mOnFeedItemClickListener != null) {
                     mOnFeedItemClickListener.onImageClick(tweet.getImageUrl(), position);
                 }
             }
         });
     }
 
-    private void adjustGridViewColumnNum(GridView gridView, int childNum){
-        if (childNum<3){
+    private void adjustGridViewColumnNum(GridView gridView, int childNum) {
+        if (childNum < 3) {
             gridView.setNumColumns(childNum);
-        } else if (childNum==4) {
+        } else if (childNum == 4) {
             gridView.setNumColumns(2);
         } else {
             gridView.setColumnWidth(3);
@@ -257,7 +255,7 @@ public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     }
 
-    public static class VHeader extends RecyclerView.ViewHolder{
+    public static class VHeader extends RecyclerView.ViewHolder {
 
         private View mView;
 
@@ -267,12 +265,11 @@ public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
 
 
-
-
     }
 
     public interface OnFeedItemClickListener {
         public void onImageClick(List<String> imageUrls, int pos);
+
         public void onCommentsClick(View v, int position);
     }
 }

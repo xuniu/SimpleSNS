@@ -3,6 +3,7 @@ package me.xuneal.simplesns.app.ui;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
@@ -15,18 +16,20 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVUser;
 import com.avos.avoscloud.LogInCallback;
 import com.avos.avoscloud.SaveCallback;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.rengwuxian.materialedittext.MaterialEditText;
 import me.xuneal.simplesns.app.R;
 import me.xuneal.simplesns.app.model.Account;
 
-public class RegisterActivity extends ActionBarActivity {
+public class RegisterActivity extends BaseActivity {
 
     private ScrollView mRegisterFormView;
     private ProgressBar mProgressView;
-    private EditText mEtUsername;
-    private EditText mEtPassword;
+    private MaterialEditText mEtUsername;
+    private MaterialEditText mEtPassword;
     private Button mBtnSignUp;
     private ImageView mIvAvatar;
-    private EditText mEtNickname;
+    private MaterialEditText mEtNickname;
 
     private String mAvatarSrc = "asset://ic_avatar.png";
 
@@ -37,10 +40,16 @@ public class RegisterActivity extends ActionBarActivity {
 
         mRegisterFormView = (ScrollView)findViewById(R.id.register_form);
         mProgressView = (ProgressBar) findViewById(R.id.pb_register);
-        mEtUsername = (EditText) findViewById(R.id.et_username);
-        mEtPassword = (EditText) findViewById(R.id.et_password);
-        mEtNickname = (EditText) findViewById(R.id.et_nickname);
+        mEtUsername = (MaterialEditText) findViewById(R.id.et_username);
+        mEtPassword = (MaterialEditText) findViewById(R.id.et_password);
+        mEtNickname = (MaterialEditText) findViewById(R.id.et_nickname);
         mIvAvatar = (ImageView)findViewById(R.id.iv_avatar);
+        mIvAvatar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(new Intent(RegisterActivity.this, PickPhotos.class), 0);
+            }
+        });
         mBtnSignUp = (Button) findViewById(R.id.btn_sign_up);
         mBtnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,5 +141,15 @@ public class RegisterActivity extends ActionBarActivity {
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             mRegisterFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode==0 && resultCode == RESULT_OK && data!=null){
+            mAvatarSrc = data.getStringExtra("url");
+            ImageLoader.getInstance().displayImage(mAvatarSrc, mIvAvatar);
+
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

@@ -32,11 +32,11 @@
         </activity>
         <activity
             android:name="me.xuneal.simplesns.app.ui.LoginActivity"
-            android:label="Login" />
+            android:label="@string/title_activity_login" />
         <activity
             android:name="me.xuneal.simplesns.app.ui.PostActivity"
             android:launchMode="singleTop"
-            android:label="Post"
+            android:label="@string/title_activity_post"
             android:parentActivityName="me.xuneal.simplesns.app.ui.MainActivity" />
         <activity
             android:name="me.xuneal.simplesns.app.ui.ProfileActivity"

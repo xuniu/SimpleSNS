@@ -18,8 +18,11 @@ import android.widget.*;
 import com.avos.avoscloud.*;
 import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
 import com.melnykov.fab.FloatingActionButton;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.listener.PauseOnScrollListener;
 import com.special.ResideMenu.ResideMenu;
 import com.special.ResideMenu.ResideMenuItem;
+import de.hdodenhof.circleimageview.CircleImageView;
 import in.srain.cube.views.ptr.PtrFrameLayout;
 import me.xuneal.simplesns.app.MyApplication;
 import me.xuneal.simplesns.app.R;
@@ -49,11 +52,9 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
     private MenuItem profileMenuItem;
     private ImageView mLogo;
     private FloatingActionButton fab;
-
+    private CircleImageView mCivAvatar;
     boolean pendingIntroAnimation;
     private ResideMenu mResideMenu;
-    private PtrFrameLayout mPtrFrame;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
     private RainbowProgressbar mRainbowProgressBar;
     private ImageView mIvHeader;
     private GestureDetector mGestureDetector;
@@ -67,13 +68,24 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
         AVAnalytics.trackAppOpened(getIntent());
         setContentView(R.layout.activity_main);
 
+        if (AVUser.getCurrentUser() == null) {
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
+
         mRecyclerView = (ObservableRecyclerView) findViewById(R.id.my_recycler_view);
 
+//        boolean pauseOnScroll = false; // or true
+//        boolean pauseOnFling = true; // or false
+//        PauseOnScrollListener listener = new PauseOnScrollListener(ImageLoader.getInstance(), pauseOnScroll, pauseOnFling);
+//        mRecyclerView.setOnScrollListener(listener);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mTweetAdapter = new TweetAdapter(this, new ArrayList<Tweet>());
         mRainbowProgressBar = (RainbowProgressbar) findViewById(R.id.rpb);
         RelativeLayout relativeLayout = (RelativeLayout) LayoutInflater.from(this).inflate(R.layout.item_header, null);
+        mCivAvatar = (CircleImageView) relativeLayout.findViewById(R.id.civ_avatar);
         mIvHeader = (ImageView) relativeLayout.findViewById(R.id.iv_header);
         mTweetAdapter.setHeader(relativeLayout);
         mRecyclerView.setOnTouchListener(new View.OnTouchListener() {
@@ -123,19 +135,6 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
 
         mLogo = (ImageView) findViewById(R.id.logo);
 
-//        mRainbowProgressBar.setOnRefreshListener(new RainbowProgressbar.OnRefreshListener() {
-//            @Override
-//            public void onRefresh() {
-//                mRainbowProgressBar.postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        mRainbowProgressBar.setRefresh(false);
-//                    }
-//                }, 4000);
-//            }
-//        });
-
-
         getActionBarToolbar().setNavigationIcon(R.drawable.ic_menu_white);
 
         if (savedInstanceState == null) {
@@ -152,7 +151,10 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
         mResideMenu.attachToActivity(this);
 
         // create menu items;
-        String titles[] = { "Profile", "Setting", "About Me",  };
+        String titles[] = { getResources().getString(R.string.title_favorite),
+                getResources().getString(R.string.title_setting),
+                getResources().getString(R.string.title_about_me),
+                 };
         int icon[] = { R.drawable.ic_profile, R.drawable.ic_settings, R.drawable.ic_about_me};
 
         for (int i = 0; i < titles.length; i++){
@@ -174,22 +176,17 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
             }
         });
 
-        mRainbowProgressBar.setRefresh(true);
-        mRainbowProgressBar.setOnRefreshListener(new RainbowProgressbar.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                loadData();
-            }
-        });
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                loadData();
-            }
-        }, 1000);
+
+
+        Account account = AccountUtils.getDefaultAccount();
+
+        if (account!=null) {
+            ImageLoader.getInstance().displayImage(account.getAvatar(), mCivAvatar);
+        }
     }
 
     private void loadData(){
+
         AVQuery<Tweet> query = AVObject.getQuery(Tweet.class);
         query.include("images");
         query.orderByDescending("updatedAt");
@@ -201,7 +198,7 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
             public void done(final List<Tweet> tweets, AVException e) {
 
                 mRainbowProgressBar.setRefresh(false);
-                if (tweets==null) return;
+                if (tweets==null || tweets.size()<=0) return;
 
                 if (tweets.size()>20) {
                     mTweetAdapter.getTweets().clear();
@@ -217,6 +214,7 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
                 relation.getQuery().whereContainedIn("objectId", tweetIds).findInBackground(new FindCallback<Tweet>() {
                     @Override
                     public void done(List<Tweet> list, AVException e) {
+                        if (list !=null) {
                         for (Tweet post : list){
 
                             for (Tweet tweet : tweets){
@@ -224,7 +222,7 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
                                     tweet.setLike(true);
                                 }
                             }
-                        }
+                        }}
 
                         mTweetAdapter.getTweets().addAll(tweets);
                         mTweetAdapter.updateItems();
@@ -302,8 +300,20 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
                 .setDuration(ANIM_DURATION_FAB)
                 .start();
         mRainbowProgressBar.setVisibility(View.VISIBLE);
-
         mTweetAdapter.updateItems();
+        mRainbowProgressBar.setRefresh(true);
+        mRainbowProgressBar.setOnRefreshListener(new RainbowProgressbar.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                loadData();
+            }
+        });
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loadData();
+            }
+        }, 1000);
     }
 
     @Override
@@ -333,12 +343,12 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
             Tweet tweet = new Tweet();
             tweet.setContent(data.getStringExtra("content"));
             tweet.setImageUrl(data.getStringArrayListExtra("images"));
-            tweet.setPoster(AVUser.getCurrentUser(Account.class));
+            tweet.setPoster(AccountUtils.getDefaultAccount());
             tweet.setPostTime(LocalDateTime.now().toString());
 
             Notification notification = new Notification.Builder(this)
-                    .setSmallIcon(R.drawable.ic_launcher)
-                    .setContentTitle("Posting")
+                    .setSmallIcon(R.drawable.ic_action_send)
+                    .setContentTitle(getResources().getString(R.string.action_post))
                     .setContentText(tweet.getContent())
                     .setAutoCancel(false)
                     .setOngoing(true)
@@ -348,17 +358,16 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
             final NotificationManager notificationManager = ((NotificationManager)getSystemService(NOTIFICATION_SERVICE));
             notificationManager.notify(0, notification);
 
-            tweet.saveInBackground(new SaveCallback() {
+            tweet.saveAsync(new SaveCallback() {
                 @Override
                 public void done(AVException e) {
-                    if(e!=null){
+                    if (e != null) {
                         Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                    else {
+                    } else {
                         Notification notification = new Notification.Builder(MainActivity.this)
                                 .setContentTitle("Post Success")
                                 .setAutoCancel(true)
-                                .setSmallIcon(R.drawable.ic_launcher)
+                                .setSmallIcon(R.drawable.ic_action_done)
                                 .build();
                         notificationManager.notify(0, notification);
                         mHandler.postDelayed(new Runnable() {
@@ -372,8 +381,8 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
                 }
             });
 
-            mTweetAdapter.getTweets().add(0, tweet);
-            mTweetAdapter.notifyDataSetChanged();
+//            mTweetAdapter.getTweets().add(0, tweet);
+//            mTweetAdapter.updateItems();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

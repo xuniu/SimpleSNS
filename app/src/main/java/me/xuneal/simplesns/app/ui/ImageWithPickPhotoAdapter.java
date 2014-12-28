@@ -57,8 +57,13 @@ public class ImageWithPickPhotoAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView==null)
-            convertView = new SquareImageView(mContext);
+        if (convertView==null) {
+            SquareImageView squareImageView = new SquareImageView(mContext);
+            squareImageView.setMaxHeight(150);
+            squareImageView.setMaxWidth(150);
+            convertView=squareImageView;
+
+        }
         ImageLoader.getInstance().displayImage((String)getItem(position), (SquareImageView)convertView);
 
         return convertView;

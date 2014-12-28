@@ -4,16 +4,27 @@
     <string name="app_name">Simple SNS</string>
     <string name="about_me">About Me</string>
     <string name="action_settings">Settings</string>
-    <string name="register">register</string>
+    <string name="register">Sign Up</string>
     <string name="title_activity_post">Post</string>
     <string name="action_post">Post</string>
+    <string name="title_posting">Posting</string>
     <string name="title_activity_profile">Profile</string>
     <string name="action_profile">profile</string>
     <string name="title_activity_comments">Comments</string>
     <string name="title_activity_pick_photos">Pick Photos</string>
     <string name="title_activity_register">Register</string>
     <string name="title_activity_about_me">About Me</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="title_setting">Setting</string>
+    <string name="title_favorite">Favorite</string>
+    <string name="title_about_me">About Me</string>
+    <string name="send">SEND</string>
+    <string name="post_content_hint">Share some thing</string>
+    <string name="ok">SURE</string>
+    <string name="about_me_content">I\'m a Senior Android Developer who is looking for a remote work,If you like me, Pls
+        send me a mail to imxuneal@gmail.com
+    </string>
+    <string name="prompt_nick_name">Nick Name</string>
+
 
 </resources>
