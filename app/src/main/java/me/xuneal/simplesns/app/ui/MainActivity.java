@@ -145,6 +145,8 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
 
         mTweetAdapter.setOnFeedItemClickListener(this);
 
+
+
         // attach to current activity;
         mResideMenu = new ResideMenu(this);
         mResideMenu.setBackground(R.drawable.bg_resize_menu);
@@ -183,6 +185,13 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
         if (account!=null) {
             ImageLoader.getInstance().displayImage(account.getAvatar(), mCivAvatar);
         }
+
+        getActionBarTextView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mRecyclerView.smoothScrollToPosition(0);
+            }
+        });
     }
 
     private void loadData(){
@@ -358,7 +367,8 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
             final NotificationManager notificationManager = ((NotificationManager)getSystemService(NOTIFICATION_SERVICE));
             notificationManager.notify(0, notification);
 
-            tweet.saveAsync(new SaveCallback() {
+            mRecyclerView.smoothScrollToPosition(1);
+            tweet.addSaveCallbackListener(new SaveCallback() {
                 @Override
                 public void done(AVException e) {
                     if (e != null) {
@@ -380,9 +390,10 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
                     }
                 }
             });
+            tweet.saveAsync();
 
-//            mTweetAdapter.getTweets().add(0, tweet);
-//            mTweetAdapter.updateItems();
+            mTweetAdapter.getTweets().add(0, tweet);
+            mTweetAdapter.updateItems();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

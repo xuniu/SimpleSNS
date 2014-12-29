@@ -77,6 +77,9 @@ public class ProfileActivity extends BaseActivity implements ObservableScrollVie
         mActionBarSize = getActionBarSize();
         getActionBarToolbar().setBackgroundColor(getResources().getColor(android.R.color.transparent));
 
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         mTweetList.setScrollViewCallbacks(this);
 
         mTweetList.setLayoutManager(new LinearLayoutManager(this));

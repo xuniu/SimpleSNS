@@ -2,19 +2,18 @@ package me.xuneal.simplesns.app.ui;
 
 
 import android.os.Bundle;
-import android.support.v4.app.*;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.*;
-
 import android.view.animation.Animation;
 import android.widget.TextView;
-import com.nostra13.universalimageloader.core.ImageLoader;
 import me.xuneal.simplesns.app.R;
 import me.xuneal.simplesns.app.util.Utils;
-import uk.co.senab.photoview.PhotoView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -36,7 +35,6 @@ public class GalleryFragment extends DialogFragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-
      * @return A new instance of fragment GalleryFragment.
      */
     public static GalleryFragment newInstance(ArrayList<String> imageUrls, int pos) {
@@ -86,8 +84,8 @@ public class GalleryFragment extends DialogFragment {
         });
 
 
-
         mViewPager = (ViewPager) mRootView.findViewById(R.id.view_pager);
+        mTvIndicator.setText(String.format("%d/%d", mPosition+1, mImageUrls.size()));
         ImagePageAdapter adapter = new ImagePageAdapter(getChildFragmentManager());
         mViewPager.setAdapter(adapter);
         mViewPager.setCurrentItem(mPosition);
@@ -98,7 +96,7 @@ public class GalleryFragment extends DialogFragment {
 
             @Override
             public void onPageSelected(int i) {
-                mTvIndicator.setText(String.format("%d/%d",i,  mImageUrls.size()));
+                mTvIndicator.setText(String.format("%d/%d", i+1, mImageUrls.size()));
 
             }
 
@@ -140,7 +138,7 @@ public class GalleryFragment extends DialogFragment {
                 @Override
                 public void run() {
                     parentDismiss();
-                    mIsAnimationRunning=false;
+                    mIsAnimationRunning = false;
                 }
             }).start();
         } else {
@@ -153,12 +151,11 @@ public class GalleryFragment extends DialogFragment {
     }
 
 
-
-    class TapGestureListener extends GestureDetector.SimpleOnGestureListener{
+    class TapGestureListener extends GestureDetector.SimpleOnGestureListener {
 
 
         @Override
-        public boolean onSingleTapConfirmed (MotionEvent e) {
+        public boolean onSingleTapConfirmed(MotionEvent e) {
             GalleryFragment.this.dismiss();
             return super.onSingleTapUp(e);
         }

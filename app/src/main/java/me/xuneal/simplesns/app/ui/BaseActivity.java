@@ -26,7 +26,7 @@ public class BaseActivity extends ActionBarActivity {
         return mActionBarToolbar;
     }
 
-    private TextView getActionBarTextView() {
+    public TextView getActionBarTextView() {
         TextView titleTextView = null;
 
         try {

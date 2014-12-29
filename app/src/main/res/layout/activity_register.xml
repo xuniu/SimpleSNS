@@ -74,6 +74,11 @@
                 android:maxLines="1"
                 android:singleLine="true"/>
 
+            <com.andexert.library.RippleView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:rv_centered="true">
+
             <Button
                 android:id="@+id/btn_sign_up"
                 style="?android:textAppearanceSmall"
@@ -84,7 +89,7 @@
                 android:background="@drawable/btn_send_comment"
                 android:textStyle="bold"/>
 
-
+            </com.andexert.library.RippleView>
         </LinearLayout>
     </ScrollView>
 

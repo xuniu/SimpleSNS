@@ -6,11 +6,10 @@ import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.*;
-import com.avos.avoscloud.AVObject;
-import com.avos.avoscloud.AVRelation;
-import com.avos.avoscloud.AVUser;
+import com.avos.avoscloud.*;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import de.hdodenhof.circleimageview.CircleImageView;
 import me.xuneal.simplesns.app.R;
@@ -49,7 +48,6 @@ public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     public TweetAdapter(Context context, List<Tweet> tweets) {
         this.tweets = tweets;
-
         this.context = context;
     }
 
@@ -130,7 +128,7 @@ public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private void bindViewHolder(ViewHolder vh, int pos) {
         long now = LocalDateTime.now().toDateTime().getMillis();
         final Tweet tweet = tweets.get(pos);
-        ViewHolder viewHolder = vh;
+        final ViewHolder viewHolder = vh;
         ImageLoader.getInstance().displayImage(tweet.getPoster().getAvatar(), viewHolder.ivAvatar);
         viewHolder.tvNickname.setText(tweet.getPoster().getNickName());
         viewHolder.tvContent.setText(tweet.getContent());
@@ -167,6 +165,24 @@ public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 }
             }
         });
+
+        if (tweet.isLocal()){
+            viewHolder.ivPhoto.post(new Runnable() {
+                @Override
+                public void run() {
+                    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(viewHolder.ivPhoto.getWidth(), viewHolder.ivPhoto.getHeight());
+                    viewHolder.vsProgressbarContainer.setLayoutParams(layoutParams);
+                    viewHolder.vsProgressbarContainer.inflate();
+                }
+            });
+            tweet.addSaveCallbackListener(new SaveCallback() {
+                @Override
+                public void done(AVException e) {
+                    viewHolder.vsProgressbarContainer.setVisibility(View.GONE);
+                }
+            });
+//            view.findViewById(R.id.pb_upload);
+        }
     }
 
     private void adjustGridViewColumnNum(GridView gridView, int childNum) {
@@ -218,6 +234,7 @@ public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         private TextView tvPostTime;
         private CheckBox cbLike;
         private ImageView ibComment;
+        private ViewStub vsProgressbarContainer;
 
         /**
          * Find the Views in the layout<br />
@@ -234,7 +251,7 @@ public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             cbLike = (CheckBox) itemView.findViewById(R.id.cb_like);
 
             ibComment = (ImageView) itemView.findViewById(R.id.ib_comment);
-
+            vsProgressbarContainer = (ViewStub) itemView.findViewById(R.id.vs_progressbar);
             cbLike.setOnClickListener(this);
             ibComment.setOnClickListener(this);
         }

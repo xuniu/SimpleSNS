@@ -30,6 +30,7 @@ public class Tweet extends AVObject {
     private List<AVFile> mAVFiles = new ArrayList<>();
     private boolean local;
     private boolean like;
+    private SaveAsyncRunnable mSaveAsyncRunnable= new SaveAsyncRunnable();
 
     private List<String> mImageUrls;
 
@@ -145,10 +146,12 @@ public class Tweet extends AVObject {
 
     private class SaveAsyncRunnable implements Runnable {
 
-        private SaveCallback mSaveCallback;
-        SaveAsyncRunnable(SaveCallback saveCallback) {
-            mSaveCallback = saveCallback;
+        private List<SaveCallback> mSaveCallback = new ArrayList<>();
+
+        public void addSaveCallbackListener(SaveCallback saveCallback) {
+            mSaveCallback.add(saveCallback);
         }
+
         @Override
         public void run() {
             AVException exception = null;
@@ -169,14 +172,21 @@ public class Tweet extends AVObject {
             MyApplication.getInstance().getUIHandler().post(new Runnable() {
                 @Override
                 public void run() {
-                    mSaveCallback.done(finalException);
+                    if (mSaveCallback.size()>0){
+                        for (SaveCallback callback: mSaveCallback){
+                            callback.done(finalException);
+                        }
+                    }
                 }
             });
         }
     }
 
 
-    public void saveAsync(SaveCallback saveCallback) {
-        new Thread(new SaveAsyncRunnable(saveCallback)).start();
+    public void addSaveCallbackListener(SaveCallback saveCallback) {
+        mSaveAsyncRunnable.addSaveCallbackListener(saveCallback);
+    }
+    public void saveAsync() {
+        new Thread(mSaveAsyncRunnable).start();
     }
 }
