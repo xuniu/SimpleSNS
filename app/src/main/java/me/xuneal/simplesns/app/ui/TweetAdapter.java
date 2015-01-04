@@ -14,6 +14,8 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import de.hdodenhof.circleimageview.CircleImageView;
 import me.xuneal.simplesns.app.R;
 import me.xuneal.simplesns.app.model.Tweet;
+import me.xuneal.simplesns.app.ui.components.MyGridView;
+import me.xuneal.simplesns.app.ui.components.ProgressbarWithAnim;
 import me.xuneal.simplesns.app.ui.components.ReverseInterpolator;
 import me.xuneal.simplesns.app.util.Utils;
 import org.joda.time.LocalDateTime;
@@ -30,6 +32,9 @@ public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     private OnFeedItemClickListener mOnFeedItemClickListener;
     boolean mUserHeader = false;
+
+    // fake data
+    private int mProgress;
 
     public void setOnFeedItemClickListener(OnFeedItemClickListener onFeedItemClickListener) {
         mOnFeedItemClickListener = onFeedItemClickListener;
@@ -171,16 +176,39 @@ public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 @Override
                 public void run() {
                     RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(viewHolder.ivPhoto.getWidth(), viewHolder.ivPhoto.getHeight());
-                    viewHolder.vsProgressbarContainer.setLayoutParams(layoutParams);
-                    viewHolder.vsProgressbarContainer.inflate();
+                    layoutParams.addRule(RelativeLayout.BELOW, R.id.tv_content);
+                    layoutParams.topMargin = Utils.dpToPx(8);
+//                    viewHolder.vsProgressbarContainer.setLayoutParams(layoutParams);
+                    View view = viewHolder.vsProgressbarContainer.inflate();
+                    view.setLayoutParams(layoutParams);
+                    final ProgressbarWithAnim progressbarWithAnim = ((ProgressbarWithAnim) view.findViewById(R.id.pb_upload));
+                    progressbarWithAnim.setCompletedListener(new Runnable() {
+                        @Override
+                        public void run() {
+                            viewHolder.vsProgressbarContainer.setVisibility(View.GONE);
+                        }
+                    });
+                    progressbarWithAnim.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mProgress+=1;
+                            if (mProgress<=100){
+                                progressbarWithAnim.setProgress(mProgress);
+                                progressbarWithAnim.postDelayed(this, 33);
+                            }
+
+                        }
+                    });
                 }
             });
-            tweet.addSaveCallbackListener(new SaveCallback() {
-                @Override
-                public void done(AVException e) {
-                    viewHolder.vsProgressbarContainer.setVisibility(View.GONE);
-                }
-            });
+
+
+//            tweet.addSaveCallbackListener(new SaveCallback() {
+//                @Override
+//                public void done(AVException e) {
+//                    viewHolder.vsProgressbarContainer.setVisibility(View.GONE);
+//                }
+//            });
 //            view.findViewById(R.id.pb_upload);
         }
     }
@@ -246,7 +274,7 @@ public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             ivAvatar = (CircleImageView) itemView.findViewById(R.id.iv_avatar);
             tvNickname = (TextView) itemView.findViewById(R.id.tv_nickname);
             tvContent = (TextView) itemView.findViewById(R.id.tv_content);
-            ivPhoto = (GridView) itemView.findViewById(R.id.iv_photo);
+            ivPhoto = (MyGridView) itemView.findViewById(R.id.iv_photo);
             tvPostTime = (TextView) itemView.findViewById(R.id.tv_post_time);
             cbLike = (CheckBox) itemView.findViewById(R.id.cb_like);
 

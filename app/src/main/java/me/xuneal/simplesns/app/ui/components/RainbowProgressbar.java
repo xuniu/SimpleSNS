@@ -85,13 +85,7 @@ public class RainbowProgressbar extends View {
         }
         invalidate();
 
-//        } else {
-//            if (mOnRefreshListener!=null) mOnRefreshListener.onRefresh();
-//            if (!mRefresh) {
-//                mRefresh = true;
-//                postDelayed(runnable, 20);
-//            }
-//        }
+
     }
 
     public void touchRelease() {

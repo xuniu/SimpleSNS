@@ -11,12 +11,17 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by xyz on 2014/11/20.
  */
 @AVClassName("Tweets")
 public class Tweet extends AVObject {
+
+//    private CountDownLatch mSaveLatch;
+//    private AtomicInteger
 
     public static final String CONTENT = "content";
     public static final String POST_TIME = "post_time";
@@ -155,9 +160,22 @@ public class Tweet extends AVObject {
         @Override
         public void run() {
             AVException exception = null;
+//            mSaveLatch = new CountDownLatch(mAVFiles.size());
             try {
 
                 for (AVFile file : mAVFiles) {
+//                    file.saveInBackground(new SaveCallback() {
+//                                              @Override
+//                                              public void done(AVException e) {
+//                                                  mSaveLatch.countDown();
+//                                              }
+//                                          },
+//                            new ProgressCallback() {
+//                                @Override
+//                                public void done(Integer integer) {
+//
+//                                }
+//                            });
                     file.save();
                 }
                 Tweet.this.addAll(IMAGES, mAVFiles);
@@ -186,6 +204,7 @@ public class Tweet extends AVObject {
     public void addSaveCallbackListener(SaveCallback saveCallback) {
         mSaveAsyncRunnable.addSaveCallbackListener(saveCallback);
     }
+
     public void saveAsync() {
         new Thread(mSaveAsyncRunnable).start();
     }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -80,6 +81,11 @@ public class ImageWithCheckboxAdapter extends BaseAdapter {
         if (getItemViewType(position)==0){
             viewHolder.mCheckBox.setVisibility(View.GONE);
         }
+        convertView.setScaleX(0.3f);
+        convertView.setScaleY(0.3f);
+        convertView.animate().scaleX(1).scaleY(1).setDuration(200).setInterpolator(new AccelerateDecelerateInterpolator())
+                .setStartDelay(100*position)
+                .start();
         return convertView;
     }
 

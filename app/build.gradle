@@ -76,6 +76,7 @@ dependencies {
     compile 'com.github.chrisbanes.photoview:library:1.2.3'
     compile 'com.rengwuxian.materialedittext:library:1.7.1'
     compile 'com.github.traex.rippleeffect:library:1.2.3'
+    compile "com.github.japgolly.android:svg-android:2.0.6"
     compile project('libs:ResideMenu')
 
 }
