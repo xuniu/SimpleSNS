@@ -80,7 +80,7 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public void addItem(Comment comment) {
         mComments.add(comment);
         itemsCount = mComments.size();
-        notifyItemInserted(itemsCount-1);
+        notifyItemInserted(itemsCount);
     }
 
 

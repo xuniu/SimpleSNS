@@ -4,7 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -21,6 +21,8 @@ public class ImageWithCheckboxAdapter extends BaseAdapter {
 
     private List<String> mImages;
     private Context mContext;
+    public  int mMaxAnimationCount = 20;
+    private int lastAnimationPosition = -1;
     public ImageWithCheckboxAdapter(Context context, List<String> images){
         mImages = images;
         mContext = context;
@@ -60,6 +62,21 @@ public class ImageWithCheckboxAdapter extends BaseAdapter {
         return true;
     }
 
+    private void runAnimationView(View view, int position){
+        if (position>= mMaxAnimationCount -1){
+            return;
+        }
+        if(position>lastAnimationPosition){
+            lastAnimationPosition = position;
+            view.setScaleX(0.3f);
+            view.setScaleY(0.3f);
+            view.setAlpha(0.1f);
+            view.animate().scaleX(1).scaleY(1).alpha(1).setDuration(300).setInterpolator(new DecelerateInterpolator(2.0f))
+                    .setStartDelay(100*position)
+                    .start();
+
+        }
+    }
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
@@ -81,11 +98,7 @@ public class ImageWithCheckboxAdapter extends BaseAdapter {
         if (getItemViewType(position)==0){
             viewHolder.mCheckBox.setVisibility(View.GONE);
         }
-        convertView.setScaleX(0.3f);
-        convertView.setScaleY(0.3f);
-        convertView.animate().scaleX(1).scaleY(1).setDuration(200).setInterpolator(new AccelerateDecelerateInterpolator())
-                .setStartDelay(100*position)
-                .start();
+        runAnimationView(convertView, position);
         return convertView;
     }
 
@@ -95,4 +108,9 @@ public class ImageWithCheckboxAdapter extends BaseAdapter {
         CheckableRelativeLayout mCheckableLayout;
 
     }
+
+    public void setMaxAnimationCount(int count){
+        mMaxAnimationCount = count;
+    }
+
 }

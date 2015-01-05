@@ -2,11 +2,11 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
+
     <de.hdodenhof.circleimageview.CircleImageView
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/iv_avatar"
         android:src="@drawable/ic_avatar"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginLeft="16dp"
         android:layout_width="40dp"
         android:layout_height="40dp"
@@ -14,35 +14,36 @@
 
     <TextView
         android:id="@+id/tv_nickname"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="16sp"
         android:layout_marginLeft="72dp"
-        android:layout_marginRight="16dp"
         android:layout_marginTop="8dp"
         />
+
     <TextView
-            android:id="@+id/tv_post_time"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="12sp"
-            android:alpha=".54"
-            android:layout_marginLeft="72dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_below="@+id/tv_nickname"
-            />
+        android:id="@+id/tv_post_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="10sp"
+        android:alpha=".54"
+        android:layout_marginLeft="4dp"
+        android:layout_alignBottom="@id/tv_nickname"
+        android:layout_toRightOf="@id/tv_nickname"
+        />
+
     <TextView
         android:id="@+id/tv_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="72dp"
         android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:textSize="14sp"
-        android:layout_below="@id/tv_post_time"
+        android:alpha=".87"
+        android:layout_below="@id/tv_nickname"
         />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"

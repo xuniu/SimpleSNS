@@ -3,16 +3,12 @@ package me.xuneal.simplesns.app.model;
 import android.util.Log;
 import com.avos.avoscloud.*;
 import me.xuneal.simplesns.app.MyApplication;
-import org.joda.time.LocalDate;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by xyz on 2014/11/20.
@@ -33,7 +29,7 @@ public class Tweet extends AVObject {
     public static final String TABLE_NAME = "Tweets";
 
     private List<AVFile> mAVFiles = new ArrayList<>();
-    private boolean local;
+    private boolean saved = true;
     private boolean like;
     private SaveAsyncRunnable mSaveAsyncRunnable= new SaveAsyncRunnable();
 
@@ -43,12 +39,12 @@ public class Tweet extends AVObject {
         return like;
     }
 
-    public boolean isLocal() {
-        return local;
+    public boolean isSaved() {
+        return saved;
     }
 
-    public void setLocal(boolean local) {
-        this.local = local;
+    public void setSaved(boolean saved) {
+        this.saved = saved;
     }
 
     public void setLike(boolean like) {
@@ -67,7 +63,7 @@ public class Tweet extends AVObject {
     }
 
     public List<String> getImageUrl() {
-        if (isLocal()) {
+        if (!isSaved()) {
             return mImageUrls;
         } else {
             List<AVFile> files = getList(IMAGES);
@@ -81,7 +77,7 @@ public class Tweet extends AVObject {
     }
 
     public void setImageUrl(List<String> imageUrl) {
-        setLocal(true);
+        setSaved(false);
         this.mImageUrls = imageUrl;
         for (String url : imageUrl) {
             try {

@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import me.xuneal.simplesns.app.R;
 import me.xuneal.simplesns.app.ui.components.CheckableRelativeLayout;
@@ -61,6 +62,7 @@ public class ImageWithPickPhotoAdapter extends BaseAdapter {
             SquareImageView squareImageView = new SquareImageView(mContext);
             squareImageView.setMaxHeight(150);
             squareImageView.setMaxWidth(150);
+            squareImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             convertView=squareImageView;
 
         }

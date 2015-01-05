@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.*;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVUser;
@@ -30,8 +31,8 @@ public class RegisterActivity extends BaseActivity {
     private Button mBtnSignUp;
     private ImageView mIvAvatar;
     private MaterialEditText mEtNickname;
-
-    private String mAvatarSrc = "asset://ic_avatar.png";
+public static final String DEFAULT_AVATAR_SRC = "assets://ic_avatar.png";
+    private String mAvatarSrc = DEFAULT_AVATAR_SRC;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +45,7 @@ public class RegisterActivity extends BaseActivity {
         mEtPassword = (MaterialEditText) findViewById(R.id.et_password);
         mEtNickname = (MaterialEditText) findViewById(R.id.et_nickname);
         mIvAvatar = (ImageView)findViewById(R.id.iv_avatar);
+        ImageLoader.getInstance().displayImage(mAvatarSrc, mIvAvatar);
         mIvAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -54,9 +56,19 @@ public class RegisterActivity extends BaseActivity {
         mBtnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (validForm())
                 signUp();
             }
         });
+    }
+
+    private boolean validForm() {
+        if (mAvatarSrc.equals(DEFAULT_AVATAR_SRC)) {
+            Toast.makeText(this, "虽然你是个开发人员，但是你也不能用GitHub的Logo做头像哦！", Toast.LENGTH_SHORT).show();
+            mIvAvatar.startAnimation(AnimationUtils.loadAnimation(this, R.anim.cycle_2));
+            return false;
+        }
+        return true;
     }
 
     private void signUp(){
@@ -66,7 +78,7 @@ public class RegisterActivity extends BaseActivity {
         account.setNickName(mEtNickname.getText().toString());
         account.setUsername(mEtUsername.getText().toString());
         account.setPassword(mEtPassword.getText().toString());
-        account.saveInBackground(new SaveCallback() {
+        account.saveAsync(new SaveCallback() {
             @Override
             public void done(AVException e) {
                 AVUser.logInInBackground(mEtUsername.getText().toString(), mEtPassword.getText().toString(), new LogInCallback() {
@@ -77,7 +89,8 @@ public class RegisterActivity extends BaseActivity {
                             finish();
                         } else {
                             // 登录失败
-                            Toast.makeText(RegisterActivity.this, "Register failed", Toast.LENGTH_SHORT).show();
+                            showProgress(false);
+                            Toast.makeText(RegisterActivity.this, "Register failed" + e.toString(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

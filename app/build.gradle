@@ -27,6 +27,7 @@ apt {
 
 repositories {
         jcenter()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 }
 
 android {
@@ -77,6 +78,7 @@ dependencies {
     compile 'com.rengwuxian.materialedittext:library:1.7.1'
     compile 'com.github.traex.rippleeffect:library:1.2.3'
     compile "com.github.japgolly.android:svg-android:2.0.6"
+    compile 'com.github.gabrielemariotti.recyclerview:recyclerview-animators:0.1.0-SNAPSHOT@aar'
     compile project('libs:ResideMenu')
 
 }

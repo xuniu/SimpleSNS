@@ -1,9 +1,6 @@
 package me.xuneal.simplesns.app.model;
 
-import com.avos.avoscloud.AVClassName;
-import com.avos.avoscloud.AVFile;
-import com.avos.avoscloud.AVRelation;
-import com.avos.avoscloud.AVUser;
+import com.avos.avoscloud.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +10,10 @@ import java.util.List;
  * Created by xyz on 2014/11/19.
  */
 public class Account extends AVUser {
+
+    private AVFile mAvatarFile;
+
+    public static final String AVATAR = "avatar";
 
     public Account() {   }
 
@@ -25,7 +26,7 @@ public class Account extends AVUser {
     }
 
     public String getAvatar(){
-        AVFile file = getAVFile("avatar");
+        AVFile file = getAVFile(AVATAR);
         if (file == null){
             return "assets://ic_avatar.png";
         } else {
@@ -35,8 +36,11 @@ public class Account extends AVUser {
 
     public void setAvatar(String filePath){
         try {
-            AVFile file  = AVFile.withAbsoluteLocalPath(new File(filePath).getName(), filePath);
-            put("avatar", file );
+            String realPath = filePath;
+            if (!filePath.contains("assets:")) {
+            realPath = filePath.replace("file://", "");}
+            mAvatarFile  = AVFile.withAbsoluteLocalPath(new File(realPath).getName(), realPath);
+            put(AVATAR, mAvatarFile);
         } catch (IOException ignored) {
 
         }
@@ -60,4 +64,13 @@ public class Account extends AVUser {
 //        likes.add(tweet);
 //        this.saveInBackground();
 //    }
+
+    public void saveAsync(final SaveCallback saveCallback){
+        mAvatarFile.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(AVException e) {
+                Account.this.saveInBackground(saveCallback);
+            }
+        });
+    }
 }

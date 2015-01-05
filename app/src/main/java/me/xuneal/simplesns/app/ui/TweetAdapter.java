@@ -20,7 +20,6 @@ import me.xuneal.simplesns.app.ui.components.ReverseInterpolator;
 import me.xuneal.simplesns.app.util.Utils;
 import org.joda.time.LocalDateTime;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -171,7 +170,7 @@ public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             }
         });
 
-        if (tweet.isLocal()){
+        if (!tweet.isSaved() && tweet.getImageUrl()!=null && tweet.getImageUrl().size()>0){
             viewHolder.ivPhoto.post(new Runnable() {
                 @Override
                 public void run() {
@@ -195,6 +194,7 @@ public class TweetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                             if (mProgress<=100){
                                 progressbarWithAnim.setProgress(mProgress);
                                 progressbarWithAnim.postDelayed(this, 33);
+                                tweet.setSaved(true);
                             }
 
                         }

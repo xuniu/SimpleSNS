@@ -49,8 +49,15 @@ public class PickPhotos extends BaseActivity {
 
         mIsSupportMultiSelected = getIntent().getBooleanExtra("is_multi_selected", false);
         if (mIsSupportMultiSelected){
-            mListAdapter = new ImageWithCheckboxAdapter(this, mImageUrls);
+            final ImageWithCheckboxAdapter adapter =  new ImageWithCheckboxAdapter(this, mImageUrls);
+            mListAdapter = adapter;
             mGridView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE);
+            mGridView.post(new Runnable() {
+                public void run() {
+                    adapter.setMaxAnimationCount(mGridView.getLastVisiblePosition()+1);
+
+                }
+            });
         } else {
           mListAdapter = new ImageWithPickPhotoAdapter(this, mImageUrls);
         }
@@ -71,6 +78,7 @@ public class PickPhotos extends BaseActivity {
 
             }
         });
+
 
     }
 

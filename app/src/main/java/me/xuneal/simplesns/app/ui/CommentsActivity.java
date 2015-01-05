@@ -20,11 +20,13 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import com.avos.avoscloud.*;
+import it.gmariotti.recyclerview.itemanimator.SlideInOutBottomItemAnimator;
 import me.xuneal.simplesns.app.R;
 import me.xuneal.simplesns.app.model.Account;
 import me.xuneal.simplesns.app.model.Comment;
 import me.xuneal.simplesns.app.model.Tweet;
 import me.xuneal.simplesns.app.ui.components.SendCommentButton;
+import me.xuneal.simplesns.app.util.AccountUtils;
 import me.xuneal.simplesns.app.util.Utils;
 import org.joda.time.LocalDateTime;
 
@@ -90,15 +92,7 @@ public class CommentsActivity extends BaseActivity implements View.OnClickListen
         getMenuInflater().inflate(R.menu.menu_main, menu);
         MenuItem profileMenuItem = menu.findItem(R.id.action_profile);
         profileMenuItem.setActionView(R.layout.menu_item_view);
-//        profileMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-//            @Override
-//            public boolean onMenuItemClick(MenuItem item) {
-//                Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-//                startActivity(intent);
-//                overridePendingTransition(0,0);
-//                return true;
-//            }
-//        });
+
         return true;
     }
 
@@ -107,11 +101,27 @@ public class CommentsActivity extends BaseActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comments);
         findViews();
-        mRvComments.setLayoutManager(new LinearLayoutManager(this));
-        mCommentAdapter = new CommentAdapter(mComments);
-        mRvComments.setAdapter(mCommentAdapter);
+
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mRvComments.setLayoutManager(new LinearLayoutManager(this));
+        mRvComments.setHasFixedSize(true);
+
+        mCommentAdapter = new CommentAdapter(mComments);
+
+        mRvComments.setAdapter(mCommentAdapter);
+        mRvComments.setItemAnimator(new SlideInOutBottomItemAnimator(mRvComments));
+
+        mRvComments.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        mRvComments.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                    mCommentAdapter.setAnimationsLocked(true);
+                }
+            }
+        });
+
 
         drawingStartLocation = getIntent().getIntExtra(ARG_DRAWING_START_LOCATION, 0);
         mRootPanel.setVisibility(View.VISIBLE);
@@ -123,23 +133,7 @@ public class CommentsActivity extends BaseActivity implements View.OnClickListen
                 return true;
             }
         });
-        AVQuery<Tweet> tweetQuery = new AVQuery<>(Tweet.TABLE_NAME);
-        tweetQuery.getInBackground(getIntent().getStringExtra(ARG_POST_ID), new GetCallback<Tweet>() {
-            @Override
-            public void done(Tweet tweet, AVException e) {
-                AVQuery<Comment> query = new AVQuery<Comment>(Comment.TABLE_NAME);
-                query.whereEqualTo("tweet", tweet);
-                query.include("poster").findInBackground(new FindCallback<Comment>() {
-                    @Override
-                    public void done(List<Comment> list, AVException e) {
-                        for (Comment comment : list){
-                            mComments.add(comment);
-                        }
-                        mCommentAdapter.updateItems();
-                    }
-                });
-            }
-        });
+
 
 
 
@@ -168,13 +162,33 @@ public class CommentsActivity extends BaseActivity implements View.OnClickListen
     }
 
     private void animationContent() {
-        mCommentAdapter.updateItems();
-
         mSendPanel.animate()
                 .translationY(0)
                 .setDuration(200)
                 .setInterpolator(new DecelerateInterpolator())
                 .start();
+        AVQuery<Tweet> tweetQuery = new AVQuery<>(Tweet.TABLE_NAME);
+        tweetQuery.getInBackground(getIntent().getStringExtra(ARG_POST_ID), new GetCallback<Tweet>() {
+            @Override
+            public void done(Tweet tweet, AVException e) {
+                mTweet = tweet;
+                AVQuery<Comment> query = new AVQuery<Comment>(Comment.TABLE_NAME);
+                query.whereEqualTo("tweet", tweet);
+                query.include("poster").findInBackground(new FindCallback<Comment>() {
+                    @Override
+                    public void done(List<Comment> list, AVException e) {
+                        for (Comment comment : list){
+                            mComments.add(comment);
+                        }
+                        mCommentAdapter.updateItems();
+
+                    }
+                });
+            }
+        });
+//        mCommentAdapter.updateItems();
+
+
     }
 
     @Override
@@ -197,16 +211,17 @@ public class CommentsActivity extends BaseActivity implements View.OnClickListen
     public void onSendClickListener(View v) {
         if (validateComment()) {
             Comment comment = new Comment();
-            comment.setPoster(AVUser.getCurrentUser(Account.class));
+            comment.setPoster(AccountUtils.getDefaultAccount());
             comment.setPostTime(LocalDateTime.now().toString("yyyy-MM-dd HH:mm"));
             comment.setContent(mComment.getText().toString());
             comment.setTweet(mTweet);
             comment.saveInBackground();
+
             mCommentAdapter.addItem(comment);
-            mCommentAdapter.setAnimationsLocked(false);
-            mCommentAdapter.setDelayEnterAnimation(false);
-            if (mRvComments.getChildCount()>1)
-                mRvComments.smoothScrollBy(0, mRvComments.getChildAt(0).getHeight() * mCommentAdapter.getItemCount());
+
+//            if (mRvComments.getChildCount()>1)
+////                mRvComments.smoothScrollBy(0, mRvComments.getChildAt(0).getHeight() * mCommentAdapter.getItemCount());
+//                 mRvComments.smoothScrollToPosition(mComments.size()-1);
 
             mComment.setText(null);
             mSend.setCurrentState(SendCommentButton.STATE_DONE);
