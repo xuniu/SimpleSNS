@@ -28,6 +28,7 @@ import me.xuneal.simplesns.app.MyApplication;
 import me.xuneal.simplesns.app.R;
 import me.xuneal.simplesns.app.model.Account;
 import me.xuneal.simplesns.app.model.Tweet;
+import me.xuneal.simplesns.app.ui.components.NewPauseOnScrollListener;
 import me.xuneal.simplesns.app.ui.components.RainbowProgressbar;
 import me.xuneal.simplesns.app.ui.components.ResizeAnimation;
 import me.xuneal.simplesns.app.util.AccountUtils;
@@ -76,10 +77,10 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
 
         mRecyclerView = (ObservableRecyclerView) findViewById(R.id.my_recycler_view);
 
-//        boolean pauseOnScroll = false; // or true
-//        boolean pauseOnFling = true; // or false
-//        PauseOnScrollListener listener = new PauseOnScrollListener(ImageLoader.getInstance(), pauseOnScroll, pauseOnFling);
-//        mRecyclerView.setOnScrollListener(listener);
+        boolean pauseOnScroll = false; // or true
+        boolean pauseOnFling = true; // or false
+        NewPauseOnScrollListener listener = new NewPauseOnScrollListener(ImageLoader.getInstance(), pauseOnScroll, pauseOnFling);
+        mRecyclerView.setOnScrollListener(listener);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mTweetAdapter = new TweetAdapter(this, new ArrayList<Tweet>());
@@ -207,40 +208,46 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
             public void done(final List<Tweet> tweets, AVException e) {
 
                 mRainbowProgressBar.setRefresh(false);
-                if (tweets==null || tweets.size()<=0) return;
-
-                if (tweets.size()>20) {
-                    mTweetAdapter.getTweets().clear();
-                }
-
-                final List<String> tweetIds = new ArrayList<String>(tweets.size());
-                for (Tweet tweet: tweets){
-                    tweetIds.add(tweet.getObjectId());
-                }
-                try {
-                Account account = AccountUtils.getDefaultAccount();
-                AVRelation<Tweet> relation = account.getRelation("likes");
-                relation.getQuery().whereContainedIn("objectId", tweetIds).findInBackground(new FindCallback<Tweet>() {
+                mRainbowProgressBar.postDelayed(new Runnable() {
                     @Override
-                    public void done(List<Tweet> list, AVException e) {
-                        if (list !=null) {
-                        for (Tweet post : list){
+                    public void run() {
+                        if (tweets==null || tweets.size()<=0) return;
 
-                            for (Tweet tweet : tweets){
-                                if (post.getObjectId().equals(tweet.getObjectId())){
-                                    tweet.setLike(true);
+                        if (tweets.size()>20) {
+                            mTweetAdapter.getTweets().clear();
+                        }
+
+                        final List<String> tweetIds = new ArrayList<String>(tweets.size());
+                        for (Tweet tweet: tweets){
+                            tweetIds.add(tweet.getObjectId());
+                        }
+                        try {
+                            Account account = AccountUtils.getDefaultAccount();
+                            AVRelation<Tweet> relation = account.getRelation("likes");
+                            relation.getQuery().whereContainedIn("objectId", tweetIds).findInBackground(new FindCallback<Tweet>() {
+                                @Override
+                                public void done(List<Tweet> list, AVException e) {
+                                    if (list !=null) {
+                                        for (Tweet post : list){
+
+                                            for (Tweet tweet : tweets){
+                                                if (post.getObjectId().equals(tweet.getObjectId())){
+                                                    tweet.setLike(true);
+                                                }
+                                            }
+                                        }}
+
+                                    mTweetAdapter.getTweets().addAll(tweets);
+                                    mTweetAdapter.updateItems();
+                                    mLastTweetId = mTweetAdapter.getTweets().get(0).getTweetId();
                                 }
-                            }
-                        }}
-
-                        mTweetAdapter.getTweets().addAll(tweets);
-                        mTweetAdapter.updateItems();
-                        mLastTweetId = mTweetAdapter.getTweets().get(0).getTweetId();
+                            });}
+                        catch (Exception ignored){
+                            Log.e("LOAD_DATA", ignored.getMessage());
+                        }
                     }
-                });}
-                catch (Exception ignored){
-                    Log.e("LOAD_DATA", ignored.getMessage());
-                }
+                }, 110);
+
 
             }
         });

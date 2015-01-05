@@ -24,6 +24,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import me.xuneal.simplesns.app.R;
 import me.xuneal.simplesns.app.model.Account;
 import me.xuneal.simplesns.app.model.Tweet;
+import me.xuneal.simplesns.app.ui.components.NewPauseOnScrollListener;
 import me.xuneal.simplesns.app.util.AccountUtils;
 
 import java.util.List;
@@ -82,6 +83,10 @@ public class ProfileActivity extends BaseActivity implements ObservableScrollVie
 
         mTweetList.setScrollViewCallbacks(this);
 
+        boolean pauseOnScroll = false; // or true
+        boolean pauseOnFling = true; // or false
+        NewPauseOnScrollListener listener = new NewPauseOnScrollListener(ImageLoader.getInstance(), pauseOnScroll, pauseOnFling);
+        mTweetList.setOnScrollListener(listener);
         mTweetList.setLayoutManager(new LinearLayoutManager(this));
         setBackgroundAlpha(getActionBarToolbar(), 0, getResources().getColor(R.color.color_primary));
 
