@@ -219,8 +219,8 @@ public class CommentsActivity extends BaseActivity implements View.OnClickListen
 
             mCommentAdapter.addItem(comment);
 
-//            if (mRvComments.getChildCount()>1)
-////                mRvComments.smoothScrollBy(0, mRvComments.getChildAt(0).getHeight() * mCommentAdapter.getItemCount());
+            if (mRvComments.getChildCount()>1)
+                mRvComments.smoothScrollBy(0, mRvComments.getChildAt(0).getHeight() * mCommentAdapter.getItemCount());
 //                 mRvComments.smoothScrollToPosition(mComments.size()-1);
 
             mComment.setText(null);

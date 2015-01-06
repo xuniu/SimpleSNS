@@ -199,7 +199,7 @@ implements TweetAdapter.OnFeedItemClickListener, View.OnClickListener {
 
         AVQuery<Tweet> query = AVObject.getQuery(Tweet.class);
         query.include("images");
-        query.orderByDescending("updatedAt");
+        query.orderByDescending("post_time");
         query.include(Tweet.POSTER);
         query.whereGreaterThan("tweetId", mLastTweetId);
         query.setLimit(20);

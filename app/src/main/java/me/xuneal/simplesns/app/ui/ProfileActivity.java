@@ -107,7 +107,7 @@ public class ProfileActivity extends BaseActivity implements ObservableScrollVie
         Account account = AccountUtils.getDefaultAccount();
         AVRelation<Tweet> relation = account.getRelation("likes");
 
-        AVQuery<Tweet> query = relation.getQuery().include("images").include(Tweet.POSTER).orderByDescending("updatedAt");
+        AVQuery<Tweet> query = relation.getQuery().include("images").include(Tweet.POSTER).orderByDescending("post_time");
 //        AVQuery<Tweet> query = new AVQuery<Tweet>(Tweet.TABLE_NAME);
 //        query.include("images");
 //        query.include(Tweet.POSTER);
