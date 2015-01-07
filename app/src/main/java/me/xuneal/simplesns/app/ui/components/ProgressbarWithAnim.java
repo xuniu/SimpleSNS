@@ -17,7 +17,7 @@ public class ProgressbarWithAnim extends View {
     private float mCenterPointX;
     private float mCenterPointY;
     private float mRadius;
-    private Path clipPath;
+    private Path mClipPath;
     private Rect mCheckMarkRect;
     private int mProgress = 0;
     private RectF mArcRect;
@@ -40,14 +40,15 @@ public class ProgressbarWithAnim extends View {
         mArcPaint.setStrokeWidth(10f);
         mArcPaint.setColor(getResources().getColor(R.color.blue));
         mArcPaint.setStyle(Paint.Style.STROKE);
+
         mCirclePaint.setStrokeWidth(3f);
         mCirclePaint.setColor(getResources().getColor(R.color.lime));
         mCirclePaint.setStyle(Paint.Style.FILL);
         mCenterPointX = getWidth() / 2;
         mCenterPointY = getHeight() / 2;
         mRadius = 100;
-        clipPath = new Path();
-        clipPath.addCircle(mCenterPointX, mCenterPointY, 100, Path.Direction.CW);
+        mClipPath = new Path();
+        mClipPath.addCircle(mCenterPointX, mCenterPointY, 100, Path.Direction.CW);
         mCheckMarkRect = new Rect((int) mCenterPointX - 90, (int) mCenterPointY + 90, (int) mCenterPointX + 90, (int) mCenterPointY + 270);
         mArcRect = new RectF(mCenterPointX - 100f, mCenterPointY - 100f, mCenterPointX + 100f, mCenterPointY + 100f);
         mTransitionY = (mRadius - 10) * 2;
@@ -74,7 +75,7 @@ public class ProgressbarWithAnim extends View {
     }
 
 
-
+    /** 设置上传完成的callBack */
     public void setCompletedListener(Runnable runAfterSuccess) {
         mRunAfterSuccess = runAfterSuccess;
     }
@@ -89,14 +90,10 @@ public class ProgressbarWithAnim extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         canvas.save();
-        canvas.clipPath(clipPath);
+        canvas.clipPath(mClipPath);
 
         SVG svg = new SVGBuilder()
-                .readFromResource(getResources(), R.raw.svg_check_mark) // if svg in res/raw
-                        // .setWhiteMode(true) // draw fills in white, doesn't draw strokes
-                        // .setColorSwap(0xFF008800, 0xFF33AAFF) // swap a single colour
-                        // .setColorFilter(filter) // run through a colour filter
-                        // .set[Stroke|Fill]ColorFilter(filter) // apply a colour filter to only the stroke or fill
+                .readFromResource(getResources(), R.raw.svg_check_mark)
                 .build();
 
         if (mProgress >= 100) {

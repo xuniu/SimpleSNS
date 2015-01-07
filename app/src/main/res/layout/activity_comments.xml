@@ -5,7 +5,7 @@
                 tools:context="me.xuneal.simplesns.app.ui.CommentsActivity">
     <include layout="@layout/toolbar_image_logo" />
     <LinearLayout
-        android:id="@+id/root_panel"
+        android:id="@+id/ll_root_panel"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -30,7 +30,7 @@
                 android:background="@drawable/shadow_top" />
         </FrameLayout>
         <LinearLayout
-            android:id="@+id/send_panel"
+            android:id="@+id/ll_send_panel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/bg_comments"
@@ -40,7 +40,7 @@
             android:paddingRight="8dp"
             android:paddingTop="8dp">
             <EditText
-                android:id="@+id/comment"
+                android:id="@+id/tv_comment_content"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
